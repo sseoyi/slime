@@ -87,7 +87,6 @@
     font-size:clamp(4.2rem, 17vw, 11rem);
     line-height:0.95;
     color:var(--pink-deep);
-    text-shadow:0 0 20px rgba(255,143,168,0.55), 0 0 50px rgba(255,143,168,0.22);
     text-transform:uppercase;
   }
 
@@ -102,7 +101,6 @@
     padding:7px 18px;
     border-radius:999px;
     margin-bottom:26px;
-    box-shadow:0 4px 14px rgba(255,143,168,0.18);
   }
   .countdown-digits{
     font-family:'Roundy Rainbows', 'Klee One', cursive;
@@ -142,7 +140,6 @@
     font-size:clamp(4.2rem, 17vw, 11rem);
     line-height:0.95;
     color:var(--pink-deep);
-    text-shadow:0 0 32px rgba(255,143,168,0.55), 0 0 70px rgba(255,143,168,0.28);
     opacity:0;
     transform:scale(0.3);
     text-transform:uppercase;
@@ -162,7 +159,6 @@
     font-family:'Zen Maru Gothic', sans-serif; font-weight:700; font-size:1rem;
     letter-spacing:0.06em;
     background:var(--pink-deep); color:#fff;
-    box-shadow:0 10px 30px rgba(255,143,168,0.4);
     opacity:0; transform:translateY(10px);
     transition:opacity 0.7s ease, transform 0.7s ease, background 0.2s ease;
     pointer-events:none;
@@ -182,7 +178,6 @@
     background:rgba(255,255,255,0.9); border:2px solid var(--pink);
     color:var(--pink-deep); font-size:1.6rem; cursor:pointer;
     display:flex; align-items:center; justify-content:center;
-    box-shadow:0 8px 30px rgba(255,143,168,0.4);
     transition:transform 0.25s ease, opacity 0.4s ease;
   }
   .play-overlay:hover{ transform:scale(1.07); }
@@ -192,7 +187,6 @@
   #screen-gif{ cursor:pointer; }
   #gifImg{
     max-width:min(72vw,520px); max-height:60vh; width:auto; height:auto;
-    filter:drop-shadow(0 10px 40px rgba(255,143,168,0.35));
     transition:transform 0.35s ease;
   }
   #screen-gif:hover #gifImg{ transform:scale(1.02); }
@@ -253,7 +247,7 @@
   .modal{
     width:100%; max-width:460px; max-height:88vh; overflow-y:auto;
     background:var(--panel); border:1px solid var(--line); border-radius:22px;
-    padding:28px 26px; box-shadow:0 30px 80px rgba(255,143,168,0.25);
+    padding:28px 26px;
   }
   .modal h2{
     font-family:'Klee One', cursive; font-weight:600; font-size:1.35rem; margin:0 0 6px;
@@ -608,7 +602,7 @@
 
   // Commits one or more files (as base64 content) to the repo in a single commit,
   // using the Git Data API so files well over 1MB (like video) work reliably.
-  async function commitFilesToRepo(files, message){
+  async function commitFilesToRepoOnce(files, message){
     const { token, owner, repo, branch } = getGithubFields();
     if(!token) throw new Error('Add a GitHub access token first.');
     if(!owner || !repo) throw new Error('Add a repo owner and name first.');
@@ -645,6 +639,40 @@
     });
 
     return true;
+  }
+
+  function isFastForwardConflict(err){
+    const msg = (err && err.message || '').toLowerCase();
+    return msg.indexOf('fast forward') !== -1 || msg.indexOf('422') !== -1 || msg.indexOf('reference already exists') !== -1;
+  }
+
+  function sleep(ms){ return new Promise((resolve) => setTimeout(resolve, ms)); }
+
+  // Retries a commit a few times if the branch ref moved underneath us
+  // (e.g. another upload landed between our ref read and our ref update).
+  async function commitFilesToRepoWithRetry(files, message){
+    const maxAttempts = 5;
+    let lastErr;
+    for(let attempt = 1; attempt <= maxAttempts; attempt++){
+      try{
+        return await commitFilesToRepoOnce(files, message);
+      }catch(err){
+        lastErr = err;
+        if(!isFastForwardConflict(err) || attempt === maxAttempts) throw err;
+        await sleep(300 * attempt); // brief backoff, then re-read the ref and retry
+      }
+    }
+    throw lastErr;
+  }
+
+  // Serializes all repo commits so uploads picked at nearly the same time
+  // (video + gif, or two gifs) never race each other's branch ref update.
+  let githubCommitQueue = Promise.resolve();
+  function commitFilesToRepo(files, message){
+    const run = githubCommitQueue.then(() => commitFilesToRepoWithRetry(files, message));
+    // swallow so a failed commit doesn't permanently jam the queue for the next one
+    githubCommitQueue = run.catch(() => {});
+    return run;
   }
 
   // Reads the published data.json straight from the repo (no token needed for a public repo).
