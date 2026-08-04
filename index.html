@@ -515,9 +515,34 @@
     return d.toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' });
   }
 
+  // window.storage only exists inside Claude's artifact preview. Once this file
+  // is deployed as a real standalone page (GitHub Pages, opened directly, etc.)
+  // that object doesn't exist, so we fall back to localStorage transparently.
+  // NOTE: localStorage has no "shared" concept — it's just per-browser, which is
+  // fine for the token (private either way) but means a deployed site's config
+  // has to be published via data.json for other visitors to see it (which it is).
+  const LOCAL_PREFIX = 'birthday-site::';
+  function hasArtifactStorage(){
+    return typeof window.storage !== 'undefined' && window.storage && typeof window.storage.get === 'function';
+  }
+  async function storageGet(key, shared){
+    if(hasArtifactStorage()){
+      return window.storage.get(key, shared).catch(() => null);
+    }
+    const raw = localStorage.getItem(LOCAL_PREFIX + key);
+    return raw === null ? null : { key, value: raw };
+  }
+  async function storageSet(key, value, shared){
+    if(hasArtifactStorage()){
+      return window.storage.set(key, value, shared);
+    }
+    localStorage.setItem(LOCAL_PREFIX + key, value);
+    return { key, value };
+  }
+
   async function loadConfig(){
     try{
-      const res = await window.storage.get(STORAGE_KEY, true);
+      const res = await storageGet(STORAGE_KEY, true);
       if(res && res.value){
         config = JSON.parse(res.value);
       } else {
@@ -529,7 +554,7 @@
   }
 
   async function saveConfig(newConfig){
-    const result = await window.storage.set(STORAGE_KEY, JSON.stringify(newConfig), true);
+    const result = await storageSet(STORAGE_KEY, JSON.stringify(newConfig), true);
     if(!result) throw new Error('Save failed');
     config = newConfig;
   }
@@ -537,7 +562,7 @@
   // ---------- github integration ----------
   async function loadGithubSettings(){
     try{
-      const res = await window.storage.get(GH_SETTINGS_KEY, false);
+      const res = await storageGet(GH_SETTINGS_KEY, false);
       if(res && res.value) return JSON.parse(res.value);
     }catch(e){ /* nothing saved yet */ }
     return {};
@@ -546,7 +571,7 @@
   async function persistGithubSettings(){
     const fields = getGithubFields();
     try{
-      await window.storage.set(GH_SETTINGS_KEY, JSON.stringify(fields), false);
+      await storageSet(GH_SETTINGS_KEY, JSON.stringify(fields), false);
     }catch(e){ /* best effort — token stays in the field either way */ }
   }
 
