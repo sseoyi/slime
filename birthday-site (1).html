@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Little Gift Waiting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  @font-face{
+    font-family:'Roundy Rainbows';
+    src:url(data:font/ttf;base64,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) format('truetype');
+    font-weight:normal;
+    font-style:normal;
+    font-display:swap;
+  }
+  :root{
+    --bg: #FAFAFA;
+    --bg-2: #fff1ee;
+    --panel: #ffffff;
+    --panel-2: #fff0ea;
+    --line: #ffd9e0;
+    --pink: #ff8fa8;
+    --pink-deep: #ff6b8f;
+    --coral: #f76c6c;
+    --gold: #e3a857;
+    --mint: #bfe3e0;
+    --ink: #5b4640;
+    --ink-dim: #9c8480;
+    --ink-faint: #c7b3ae;
+    --paper: #fffaf6;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Zen Maru Gothic', sans-serif;
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app{
+    position:fixed; inset:0;
+    background:var(--bg);
+  }
+  /* stars */
+  .petal{
+    position:absolute; top:-5vh;
+    width:13px; height:13px;
+    clip-path:polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    opacity:0.75;
+    animation:fall linear infinite;
+    z-index:1;
+    pointer-events:none;
+  }
+  @keyframes fall{
+    0%{ transform:translate(0,0) rotate(0deg); }
+    50%{ transform:translate(24px,55vh) rotate(180deg); }
+    100%{ transform:translate(-10px,112vh) rotate(360deg); }
+  }
+  @media (prefers-reduced-motion: reduce){ .petal{ display:none; } }
+
+  .screen{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    opacity:0; visibility:hidden; pointer-events:none;
+    transition:opacity 1.1s ease;
+    padding:6vw;
+    text-align:center;
+    z-index:2;
+  }
+  .screen.active{ opacity:1; visibility:visible; pointer-events:auto; }
+
+  /* ---------- loading ---------- */
+  .loader{
+    width:34px; height:34px; border-radius:50%;
+    border:3px solid var(--line); border-top-color:var(--pink-deep);
+    animation:spin 0.9s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  /* ---------- empty / not configured ---------- */
+  .empty-mark{
+    font-family:'Roundy Rainbows', 'Klee One', cursive;
+    font-size:clamp(4.2rem, 17vw, 11rem);
+    line-height:0.95;
+    color:var(--pink-deep);
+    text-shadow:0 0 20px rgba(255,143,168,0.55), 0 0 50px rgba(255,143,168,0.22);
+    text-transform:uppercase;
+  }
+
+  /* ---------- countdown ---------- */
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'Zen Maru Gothic', sans-serif;
+    font-size:0.78rem; letter-spacing:0.1em;
+    color:var(--pink-deep);
+    background:#fff;
+    border:1px solid var(--line);
+    padding:7px 18px;
+    border-radius:999px;
+    margin-bottom:26px;
+    box-shadow:0 4px 14px rgba(255,143,168,0.18);
+  }
+  .countdown-digits{
+    font-family:'Roundy Rainbows', 'Klee One', cursive;
+    font-weight:600;
+    font-size:clamp(4.2rem, 17vw, 11rem);
+    line-height:0.95;
+    color:var(--pink-deep);
+    letter-spacing:-0.01em;
+    text-transform:uppercase;
+  }
+  .countdown-daylabel{
+    font-family:'Zen Maru Gothic', sans-serif;
+    font-size:clamp(0.8rem,1.6vw,1rem);
+    letter-spacing:0.06em;
+    color:var(--ink-dim); margin-top:16px;
+  }
+  .countdown-date{
+    margin-top:8px; font-size:0.85rem; color:var(--ink-faint);
+    font-family:'Klee One', cursive;
+  }
+
+  /* ---------- D-DAY gate ---------- */
+  #screen-dday{ perspective:1400px; }
+  .dday-content{
+    display:flex; flex-direction:column; align-items:center;
+    transform-origin:top center;
+    transition:transform 0.9s cubic-bezier(.55,.05,.55,.95), opacity 0.9s ease;
+    transform-style:preserve-3d;
+  }
+  .dday-content.flip-out{
+    transform:rotateX(-100deg) translateY(-30px);
+    opacity:0;
+  }
+  .dday-text{
+    font-family:'Roundy Rainbows', 'Klee One', cursive;
+    font-weight:600;
+    font-size:clamp(4.2rem, 17vw, 11rem);
+    line-height:0.95;
+    color:var(--pink-deep);
+    text-shadow:0 0 32px rgba(255,143,168,0.55), 0 0 70px rgba(255,143,168,0.28);
+    opacity:0;
+    transform:scale(0.3);
+    text-transform:uppercase;
+  }
+  .dday-text.pop{
+    animation:ddayPop 0.7s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+  @keyframes ddayPop{
+    0%{ transform:scale(0.3); opacity:0; }
+    60%{ transform:scale(1.15); opacity:1; }
+    100%{ transform:scale(1); opacity:1; }
+  }
+  .start-btn{
+    margin-top:34px;
+    padding:16px 52px;
+    border:none; border-radius:999px; cursor:pointer;
+    font-family:'Zen Maru Gothic', sans-serif; font-weight:700; font-size:1rem;
+    letter-spacing:0.06em;
+    background:var(--pink-deep); color:#fff;
+    box-shadow:0 10px 30px rgba(255,143,168,0.4);
+    opacity:0; transform:translateY(10px);
+    transition:opacity 0.7s ease, transform 0.7s ease, background 0.2s ease;
+    pointer-events:none;
+  }
+  .start-btn.show{ opacity:1; transform:translateY(0); pointer-events:auto; }
+  .start-btn:hover{ background:var(--coral); }
+  @media (prefers-reduced-motion: reduce){
+    .dday-text{ opacity:1; transform:scale(1); animation:none; }
+    .dday-content.flip-out{ transform:none; opacity:0; transition:opacity 0.4s ease; }
+  }
+
+  /* ---------- video ---------- */
+  #screen-video{ padding:0; background:#1a1414; }
+  #mainVideo{ width:100%; height:100%; object-fit:contain; background:#1a1414; }
+  .play-overlay{
+    position:absolute; inset:0; margin:auto; width:84px; height:84px; border-radius:50%;
+    background:rgba(255,255,255,0.9); border:2px solid var(--pink);
+    color:var(--pink-deep); font-size:1.6rem; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 8px 30px rgba(255,143,168,0.4);
+    transition:transform 0.25s ease, opacity 0.4s ease;
+  }
+  .play-overlay:hover{ transform:scale(1.07); }
+  .play-overlay.hidden{ opacity:0; pointer-events:none; }
+
+  /* ---------- gif ---------- */
+  #screen-gif{ cursor:pointer; }
+  #gifImg{
+    max-width:min(72vw,520px); max-height:60vh; width:auto; height:auto;
+    filter:drop-shadow(0 10px 40px rgba(255,143,168,0.35));
+    transition:transform 0.35s ease;
+  }
+  #screen-gif:hover #gifImg{ transform:scale(1.02); }
+  #screen-gif.switched #gifImg{ animation:pulse 0.7s ease; }
+  @keyframes pulse{ 0%{transform:scale(1);} 40%{transform:scale(1.08);} 100%{transform:scale(1);} }
+  .gif-hint{
+    margin-top:26px; font-family:'Klee One', cursive; font-size:0.95rem;
+    color:var(--pink-deep);
+    animation:hintpulse 2.2s ease-in-out infinite;
+  }
+  @keyframes hintpulse{ 0%,100%{ opacity:0.55; } 50%{ opacity:1; } }
+
+  /* ---------- reveal (white fade) ---------- */
+  #whiteOverlay{
+    position:fixed; inset:0; z-index:60;
+    background:var(--paper);
+    opacity:0; pointer-events:none;
+    transition:opacity 2.6s ease;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #whiteOverlay.show{ opacity:1; pointer-events:auto; }
+  .reveal-content{
+    opacity:0; transform:translateY(6px);
+    transition:opacity 2s ease 0.35s, transform 2s ease 0.35s;
+    text-align:center; padding:6vw;
+  }
+  .reveal-content.show{ opacity:1; transform:translateY(0); }
+  #revealMessage{
+    font-family:'Roundy Rainbows', 'Klee One', cursive; font-weight:600;
+    font-size:clamp(2.2rem, 6vw, 4.2rem);
+    color:var(--pink-deep);
+    letter-spacing:-0.01em;
+  }
+  #revealName{
+    margin-top:14px; font-family:'Zen Maru Gothic', sans-serif;
+    font-size:1rem; color:var(--ink-dim);
+  }
+
+  /* ---------- admin gear ---------- */
+  #adminGear{
+    position:fixed; right:18px; bottom:16px; z-index:100;
+    width:32px; height:32px; border-radius:50%;
+    background:#fff; border:1px solid var(--line); color:var(--ink-faint);
+    font-size:0.95rem; cursor:pointer; opacity:0.35;
+    transition:opacity 0.3s ease, transform 0.3s ease;
+  }
+  #adminGear:hover{ opacity:1; transform:rotate(40deg); color:var(--pink-deep); }
+
+  /* ---------- admin modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:200;
+    background:rgba(91,70,64,0.35);
+    display:none; align-items:center; justify-content:center;
+    padding:24px;
+    backdrop-filter:blur(3px);
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal{
+    width:100%; max-width:460px; max-height:88vh; overflow-y:auto;
+    background:var(--panel); border:1px solid var(--line); border-radius:22px;
+    padding:28px 26px; box-shadow:0 30px 80px rgba(255,143,168,0.25);
+  }
+  .modal h2{
+    font-family:'Klee One', cursive; font-weight:600; font-size:1.35rem; margin:0 0 6px;
+    color:var(--pink-deep);
+  }
+  .modal p.sub{ margin:0 0 22px; color:var(--ink-dim); font-size:0.85rem; line-height:1.5; }
+  .field{ margin-bottom:16px; text-align:left; }
+  .field label{
+    display:block; font-family:'Zen Maru Gothic', sans-serif; font-size:0.72rem;
+    letter-spacing:0.04em; color:var(--ink-dim); margin-bottom:7px;
+  }
+  .field input[type=text], .field input[type=date], .field input[type=password]{
+    width:100%; padding:10px 14px; border-radius:14px; border:1px solid var(--line);
+    background:var(--bg-2); color:var(--ink); font-family:'Zen Maru Gothic',sans-serif; font-size:0.9rem;
+    outline:none; transition:border-color 0.2s ease;
+  }
+  .field input:focus{ border-color:var(--pink); }
+  .field .hint{ margin-top:6px; font-size:0.74rem; color:var(--ink-faint); line-height:1.5; }
+  .thumb-row{ display:flex; gap:10px; margin-top:8px; }
+  .thumb-row img{
+    width:52px; height:52px; object-fit:contain; border-radius:12px;
+    background:repeating-conic-gradient(#fff0ea 0% 25%, #ffe3e8 0% 50%) 0 0/12px 12px;
+    border:1px solid var(--line);
+  }
+  .gh-row{ display:flex; gap:8px; }
+  .gh-row input{ flex:1; min-width:0; }
+  .field input[type=file]{
+    width:100%; padding:9px 10px; border-radius:14px; border:1px solid var(--line);
+    background:var(--bg-2); color:var(--ink); font-family:'Zen Maru Gothic',sans-serif; font-size:0.8rem;
+  }
+  .section-divider{
+    margin:22px 0 18px; border:none; border-top:1px dashed var(--line);
+  }
+  .section-label{
+    font-family:'Zen Maru Gothic', sans-serif; font-weight:700; font-size:0.72rem;
+    letter-spacing:0.1em; text-transform:uppercase; color:var(--pink-deep); margin-bottom:14px;
+  }
+  .btn{
+    width:100%; padding:12px 14px; border-radius:999px; border:none; cursor:pointer;
+    font-family:'Zen Maru Gothic',sans-serif; font-weight:700; font-size:0.88rem;
+    background:var(--pink-deep); color:#fff; transition:opacity 0.2s ease, transform 0.15s ease;
+  }
+  .btn:hover{ opacity:0.9; transform:translateY(-1px); }
+  .btn.secondary{
+    background:#fff; color:var(--pink-deep); border:1.5px solid var(--pink); margin-top:10px;
+  }
+  .btn.ghost{
+    background:transparent; color:var(--ink-faint); border:none; margin-top:14px;
+    font-weight:500; font-size:0.78rem; text-decoration:underline;
+  }
+  .modal-close{
+    float:right; background:none; border:none; color:var(--ink-faint); font-size:1.2rem; cursor:pointer;
+  }
+  .save-msg{
+    margin-top:12px; font-size:0.8rem; color:var(--pink-deep); text-align:center; min-height:1em;
+  }
+  .error-msg{ color:var(--coral); font-size:0.8rem; margin-top:8px; min-height:1em; }
+  .clearfix::after{ content:""; display:block; clear:both; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="screen active" id="screen-loading">
+    <div class="loader"></div>
+  </div>
+
+  <div class="screen" id="screen-empty">
+    <div class="empty-mark" id="emptyDday">D-0</div>
+  </div>
+
+  <div class="screen" id="screen-countdown">
+    <div class="countdown-digits" id="countdownDigits">D-0</div>
+    <div class="countdown-daylabel" id="countdownDayLabel">days to go</div>
+    <div class="countdown-date" id="countdownDate"></div>
+  </div>
+
+  <div class="screen" id="screen-dday">
+    <div class="dday-content" id="ddayContent">
+      <div class="dday-text" id="ddayText">D-DAY</div>
+      <button class="start-btn" id="startBtn">start</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-video">
+    <video id="mainVideo" playsinline></video>
+    <button class="play-overlay" id="playBtn" aria-label="Play video">&#9654;</button>
+  </div>
+
+  <div class="screen" id="screen-gif">
+    <img id="gifImg" alt="Tap to continue">
+    <div class="gif-hint">🎁 tap 🎁</div>
+  </div>
+</div>
+
+<div id="whiteOverlay">
+  <div class="reveal-content" id="revealContent">
+    <div id="revealMessage">Happy Birthday</div>
+    <div id="revealName"></div>
+  </div>
+</div>
+
+<button id="adminGear" aria-label="Admin settings" title="Admin settings">&#9881;</button>
+
+<div class="modal-overlay" id="adminModal">
+  <div class="modal">
+    <button class="modal-close clearfix" id="closeModal" aria-label="Close">&times;</button>
+
+    <div id="adminAuth">
+      <h2>Admin access</h2>
+      <p class="sub">Enter the password to edit this site.</p>
+      <div class="field">
+        <label for="pwInput">Password</label>
+        <input type="password" id="pwInput" autocomplete="off">
+      </div>
+      <button class="btn" id="pwSubmit">Unlock</button>
+      <div class="error-msg" id="pwError"></div>
+    </div>
+
+    <div id="adminForm" hidden>
+      <h2>Site settings</h2>
+      <p class="sub">Uploads go straight into your GitHub repo. Anyone who opens this site reads from data.json there.</p>
+
+      <div class="section-label">GitHub repo</div>
+
+      <div class="field">
+        <label for="ghOwner">Owner &amp; repo</label>
+        <div class="gh-row">
+          <input type="text" id="ghOwner" placeholder="owner">
+          <input type="text" id="ghRepo" placeholder="repo">
+        </div>
+        <div class="gh-row" style="margin-top:8px;">
+          <input type="text" id="ghBranch" placeholder="branch">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="ghToken">Access token</label>
+        <input type="password" id="ghToken" placeholder="ghp_...">
+        <div class="hint">Needs repo write access. Kept on this device across refreshes.</div>
+      </div>
+
+      <hr class="section-divider">
+      <div class="section-label">Media</div>
+
+      <div class="field">
+        <label for="videoFile">Video</label>
+        <input type="file" id="videoFile" accept="video/*">
+        <div class="hint" id="videoStatus">Not uploaded yet</div>
+      </div>
+
+      <div class="field">
+        <label for="gif1File">First image / GIF (transparent)</label>
+        <input type="file" id="gif1File" accept="image/*">
+        <div class="hint" id="gif1Status">Not uploaded yet</div>
+      </div>
+
+      <div class="field">
+        <label for="gif2File">Second image / GIF</label>
+        <input type="file" id="gif2File" accept="image/*">
+        <div class="hint" id="gif2Status">Not uploaded yet</div>
+        <div class="thumb-row">
+          <img id="thumb1" alt="">
+          <img id="thumb2" alt="">
+        </div>
+      </div>
+
+      <hr class="section-divider">
+      <div class="section-label">Details</div>
+
+      <div class="field">
+        <label for="openDate">Open date</label>
+        <input type="date" id="openDate">
+        <div class="hint">Before this date, visitors see a countdown instead of the content.</div>
+      </div>
+
+      <div class="field">
+        <label for="revealMsg">Reveal text</label>
+        <input type="text" id="revealMsg" placeholder="Happy Birthday">
+      </div>
+
+      <div class="field">
+        <label for="recipientName">Reveal subtitle (optional)</label>
+        <input type="text" id="recipientName" placeholder="e.g. a name, or a small line">
+      </div>
+
+      <button class="btn" id="publishBtn">Publish data.json to GitHub</button>
+      <div class="save-msg" id="publishStatus"></div>
+
+      <button class="btn secondary" id="previewBtn">Preview experience now</button>
+      <div class="save-msg" id="saveMsg"></div>
+      <button class="btn ghost" id="lockBtn">Lock admin panel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'birthday-site-config';
+  const ADMIN_PASSWORD = 'ssi551';
+  const DEFAULT_OPEN_DATE = '2026-08-12';
+  const DEFAULT_GH_OWNER = 'sseoyi';
+  const DEFAULT_GH_REPO = 'slime';
+  const DEFAULT_GH_BRANCH = 'main';
+  const GH_SETTINGS_KEY = 'github-settings';
+
+  const screens = {
+    loading: document.getElementById('screen-loading'),
+    empty: document.getElementById('screen-empty'),
+    countdown: document.getElementById('screen-countdown'),
+    dday: document.getElementById('screen-dday'),
+    video: document.getElementById('screen-video'),
+    gif: document.getElementById('screen-gif'),
+  };
+
+  let config = null;
+  let previewMode = false;
+  let mediaExists = { video:false, gif1:false, gif2:false };
+
+  // ambient falling stars
+  (function spawnPetals(){
+    const app = document.getElementById('app');
+    const count = 14;
+    const colors = ['#ff8fa8', '#ffd166', '#bfe3e0', '#ff6b8f'];
+    for(let i=0;i<count;i++){
+      const p = document.createElement('div');
+      p.className = 'petal';
+      const left = Math.random()*100;
+      const duration = 9 + Math.random()*8;
+      const delay = Math.random()*10;
+      const scale = 0.6 + Math.random()*0.9;
+      p.style.left = left + 'vw';
+      p.style.animationDuration = duration + 's';
+      p.style.animationDelay = '-' + delay + 's';
+      p.style.transform = 'scale(' + scale + ')';
+      p.style.background = colors[Math.floor(Math.random()*colors.length)];
+      app.insertBefore(p, app.firstChild);
+    }
+  })();
+
+  function showScreen(name){
+    Object.values(screens).forEach(s => s.classList.remove('active'));
+    screens[name].classList.add('active');
+  }
+
+  function parseLocalDate(dateStr){
+    if(!dateStr) return null;
+    const [y,m,d] = dateStr.split('-').map(Number);
+    if(!y||!m||!d) return null;
+    return new Date(y, m-1, d);
+  }
+
+  function daysUntil(dateStr){
+    const target = parseLocalDate(dateStr);
+    if(!target) return 0;
+    const now = new Date();
+    const todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diffMs = target - todayMid;
+    return Math.ceil(diffMs / 86400000);
+  }
+
+  function formatDateNice(dateStr){
+    const d = parseLocalDate(dateStr);
+    if(!d) return '';
+    return d.toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' });
+  }
+
+  async function loadConfig(){
+    try{
+      const res = await window.storage.get(STORAGE_KEY, true);
+      if(res && res.value){
+        config = JSON.parse(res.value);
+      } else {
+        config = null;
+      }
+    }catch(e){
+      config = null;
+    }
+  }
+
+  async function saveConfig(newConfig){
+    const result = await window.storage.set(STORAGE_KEY, JSON.stringify(newConfig), true);
+    if(!result) throw new Error('Save failed');
+    config = newConfig;
+  }
+
+  // ---------- github integration ----------
+  async function loadGithubSettings(){
+    try{
+      const res = await window.storage.get(GH_SETTINGS_KEY, false);
+      if(res && res.value) return JSON.parse(res.value);
+    }catch(e){ /* nothing saved yet */ }
+    return {};
+  }
+
+  async function persistGithubSettings(){
+    const fields = getGithubFields();
+    try{
+      await window.storage.set(GH_SETTINGS_KEY, JSON.stringify(fields), false);
+    }catch(e){ /* best effort — token stays in the field either way */ }
+  }
+
+  function getGithubFields(){
+    return {
+      token: document.getElementById('ghToken').value.trim(),
+      owner: document.getElementById('ghOwner').value.trim() || DEFAULT_GH_OWNER,
+      repo: document.getElementById('ghRepo').value.trim() || DEFAULT_GH_REPO,
+      branch: document.getElementById('ghBranch').value.trim() || DEFAULT_GH_BRANCH,
+    };
+  }
+
+  function rawUrl(path){
+    const { owner, repo, branch } = getGithubFields();
+    return 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + branch + '/' + path;
+  }
+
+  function cacheBust(url){
+    return url + (url.indexOf('?') === -1 ? '?' : '&') + 't=' + Date.now();
+  }
+
+  function fileToBase64(file){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result).split(',')[1]);
+      reader.onerror = () => reject(new Error('Could not read file'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function utf8ToBase64(str){
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+
+  function ghHeaders(token){
+    return {
+      'Authorization': 'token ' + token,
+      'Accept': 'application/vnd.github+json',
+      'Content-Type': 'application/json',
+    };
+  }
+
+  async function githubRequest(url, options){
+    const res = await fetch(url, options);
+    if(!res.ok){
+      let msg = 'GitHub error (' + res.status + ')';
+      try{ const j = await res.json(); if(j && j.message) msg = j.message; }catch(e){ /* ignore */ }
+      throw new Error(msg);
+    }
+    if(res.status === 204) return null;
+    return res.json();
+  }
+
+  // Commits one or more files (as base64 content) to the repo in a single commit,
+  // using the Git Data API so files well over 1MB (like video) work reliably.
+  async function commitFilesToRepo(files, message){
+    const { token, owner, repo, branch } = getGithubFields();
+    if(!token) throw new Error('Add a GitHub access token first.');
+    if(!owner || !repo) throw new Error('Add a repo owner and name first.');
+    const base = 'https://api.github.com/repos/' + owner + '/' + repo;
+
+    const refData = await githubRequest(base + '/git/ref/heads/' + branch, { headers: ghHeaders(token) });
+    const latestCommitSha = refData.object.sha;
+
+    const commitData = await githubRequest(base + '/git/commits/' + latestCommitSha, { headers: ghHeaders(token) });
+    const baseTreeSha = commitData.tree.sha;
+
+    const treeEntries = [];
+    for(const f of files){
+      const blob = await githubRequest(base + '/git/blobs', {
+        method: 'POST', headers: ghHeaders(token),
+        body: JSON.stringify({ content: f.base64Content, encoding: 'base64' }),
+      });
+      treeEntries.push({ path: f.path, mode: '100644', type: 'blob', sha: blob.sha });
+    }
+
+    const newTree = await githubRequest(base + '/git/trees', {
+      method: 'POST', headers: ghHeaders(token),
+      body: JSON.stringify({ base_tree: baseTreeSha, tree: treeEntries }),
+    });
+
+    const newCommit = await githubRequest(base + '/git/commits', {
+      method: 'POST', headers: ghHeaders(token),
+      body: JSON.stringify({ message: message, tree: newTree.sha, parents: [latestCommitSha] }),
+    });
+
+    await githubRequest(base + '/git/refs/heads/' + branch, {
+      method: 'PATCH', headers: ghHeaders(token),
+      body: JSON.stringify({ sha: newCommit.sha }),
+    });
+
+    return true;
+  }
+
+  // Reads the published data.json straight from the repo (no token needed for a public repo).
+  async function fetchPublishedData(){
+    const owner = (config && config.ghOwner) || DEFAULT_GH_OWNER;
+    const repo = (config && config.ghRepo) || DEFAULT_GH_REPO;
+    const branch = (config && config.ghBranch) || DEFAULT_GH_BRANCH;
+    const url = 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + branch + '/data.json';
+    try{
+      const res = await fetch(cacheBust(url));
+      if(!res.ok) return;
+      const data = await res.json();
+      config = Object.assign({}, config, data, { ghOwner: owner, ghRepo: repo, ghBranch: branch });
+      mediaExists.video = !!data.videoUrl;
+      mediaExists.gif1 = !!data.gif1Url;
+      mediaExists.gif2 = !!data.gif2Url;
+    }catch(e){
+      // no data.json published yet, or the repo/branch is unreachable — fall back silently
+    }
+  }
+
+  function render(){
+    const targetDate = (config && config.openDate) ? config.openDate : DEFAULT_OPEN_DATE;
+    const daysLeft = previewMode ? 0 : daysUntil(targetDate);
+    const hasMedia = config && (config.videoUrl || config.gif1Url || config.gif2Url);
+
+    if(daysLeft > 0){
+      document.getElementById('countdownDigits').textContent = 'D-' + daysLeft;
+      document.getElementById('countdownDayLabel').textContent = daysLeft === 1 ? 'day to go' : 'days to go';
+      document.getElementById('countdownDate').textContent = 'opens ' + formatDateNice(targetDate);
+      showScreen('countdown');
+      return;
+    }
+
+    if(!hasMedia){
+      document.getElementById('emptyDday').textContent = 'D-' + Math.max(daysLeft, 0);
+      showScreen('empty');
+      return;
+    }
+
+    showDdayGate();
+  }
+
+  function showDdayGate(){
+    showScreen('dday');
+    const ddayContent = document.getElementById('ddayContent');
+    const ddayText = document.getElementById('ddayText');
+    const startBtn = document.getElementById('startBtn');
+
+    ddayContent.classList.remove('flip-out');
+    ddayText.classList.remove('pop');
+    startBtn.classList.remove('show');
+    void ddayContent.offsetWidth; // force reflow so the pop-in animation replays
+    ddayText.classList.add('pop');
+
+    setTimeout(() => { startBtn.classList.add('show'); }, 750);
+
+    startBtn.onclick = () => {
+      ddayContent.classList.add('flip-out');
+      const onFlipEnd = (e) => {
+        if(e.propertyName !== 'transform') return;
+        ddayContent.removeEventListener('transitionend', onFlipEnd);
+        startExperience();
+      };
+      ddayContent.addEventListener('transitionend', onFlipEnd);
+    };
+  }
+
+  function startExperience(){
+    if(config.videoUrl){
+      const video = document.getElementById('mainVideo');
+      const playBtn = document.getElementById('playBtn');
+      video.src = config.videoUrl;
+      video.muted = false;
+      video.controls = false;
+
+      playBtn.classList.remove('hidden');
+      playBtn.onclick = () => {
+        video.play().then(() => {
+          playBtn.classList.add('hidden');
+          video.controls = true;
+        }).catch(() => {
+          video.controls = true;
+        });
+      };
+      video.onended = () => {
+        showScreen('gif');
+        startGifStage();
+      };
+      showScreen('video');
+    } else {
+      showScreen('gif');
+      startGifStage();
+    }
+  }
+
+  function startGifStage(){
+    const gifImg = document.getElementById('gifImg');
+    const gifScreen = document.getElementById('screen-gif');
+    const hint = document.querySelector('.gif-hint');
+    gifImg.src = config.gif1Url || '';
+    hint.style.display = config.gif1Url ? '' : 'none';
+    gifScreen.classList.remove('switched');
+
+    let switched = false;
+    gifScreen.onclick = () => {
+      if(switched) return;
+      switched = true;
+      hint.style.display = 'none';
+      if(config.gif2Url){
+        gifImg.src = config.gif2Url;
+      }
+      gifScreen.classList.add('switched');
+      triggerReveal();
+    };
+  }
+
+  function triggerReveal(){
+    const overlay = document.getElementById('whiteOverlay');
+    const content = document.getElementById('revealContent');
+    document.getElementById('revealMessage').textContent = (config.revealMessage && config.revealMessage.trim()) || 'Happy Birthday';
+    document.getElementById('revealName').textContent = config.recipientName || '';
+
+    setTimeout(() => {
+      overlay.classList.add('show');
+      const onEnd = (e) => {
+        if(e.propertyName !== 'opacity') return;
+        overlay.removeEventListener('transitionend', onEnd);
+        content.classList.add('show');
+      };
+      overlay.addEventListener('transitionend', onEnd);
+    }, 1600);
+  }
+
+  // ---------- admin ----------
+  const adminGear = document.getElementById('adminGear');
+  const adminModal = document.getElementById('adminModal');
+  const adminAuth = document.getElementById('adminAuth');
+  const adminForm = document.getElementById('adminForm');
+  const pwInput = document.getElementById('pwInput');
+  const pwError = document.getElementById('pwError');
+
+  let authed = false;
+
+  adminGear.addEventListener('click', () => {
+    adminModal.classList.add('open');
+    if(authed){
+      adminAuth.hidden = true;
+      adminForm.hidden = false;
+    } else {
+      adminAuth.hidden = false;
+      adminForm.hidden = true;
+      pwInput.value = '';
+      pwError.textContent = '';
+    }
+  });
+
+  document.getElementById('closeModal').addEventListener('click', () => {
+    adminModal.classList.remove('open');
+  });
+  adminModal.addEventListener('click', (e) => {
+    if(e.target === adminModal) adminModal.classList.remove('open');
+  });
+
+  document.getElementById('pwSubmit').addEventListener('click', tryAuth);
+  pwInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') tryAuth(); });
+
+  function tryAuth(){
+    if(pwInput.value === ADMIN_PASSWORD){
+      authed = true;
+      pwError.textContent = '';
+      adminAuth.hidden = true;
+      adminForm.hidden = false;
+      populateForm();
+    } else {
+      pwError.textContent = 'That password isn\'t right.';
+    }
+  }
+
+  document.getElementById('lockBtn').addEventListener('click', () => {
+    authed = false;
+    adminModal.classList.remove('open');
+  });
+
+  async function populateForm(){
+    const c = config || {};
+    const gh = await loadGithubSettings();
+    document.getElementById('ghToken').value = gh.token || '';
+    document.getElementById('ghOwner').value = gh.owner || c.ghOwner || DEFAULT_GH_OWNER;
+    document.getElementById('ghRepo').value = gh.repo || c.ghRepo || DEFAULT_GH_REPO;
+    document.getElementById('ghBranch').value = gh.branch || c.ghBranch || DEFAULT_GH_BRANCH;
+    document.getElementById('openDate').value = c.openDate || DEFAULT_OPEN_DATE;
+    document.getElementById('revealMsg').value = c.revealMessage || 'Happy Birthday';
+    document.getElementById('recipientName').value = c.recipientName || '';
+    updateMediaStatusDisplay();
+  }
+
+  function updateMediaStatusDisplay(){
+    const c = config || {};
+    document.getElementById('videoStatus').textContent = mediaExists.video ? 'Published \u2713 (video.mp4)' : 'Not uploaded yet';
+    document.getElementById('gif1Status').textContent = mediaExists.gif1 ? 'Published \u2713 (img-1.gif)' : 'Not uploaded yet';
+    document.getElementById('gif2Status').textContent = mediaExists.gif2 ? 'Published \u2713 (img-2.gif)' : 'Not uploaded yet';
+    document.getElementById('thumb1').src = c.gif1Url || '';
+    document.getElementById('thumb2').src = c.gif2Url || '';
+  }
+
+  ['ghToken','ghOwner','ghRepo','ghBranch'].forEach((id) => {
+    document.getElementById(id).addEventListener('change', persistGithubSettings);
+  });
+
+  async function handleMediaUpload(e, path, statusId, mediaKey, thumbId){
+    const file = e.target.files[0];
+    if(!file) return;
+    const statusEl = document.getElementById(statusId);
+    if(thumbId){ document.getElementById(thumbId).src = URL.createObjectURL(file); }
+    statusEl.textContent = 'Uploading ' + path + '...';
+    try{
+      await persistGithubSettings();
+      const base64 = await fileToBase64(file);
+      await commitFilesToRepo([{ path: path, base64Content: base64 }], 'Update ' + path);
+      mediaExists[mediaKey] = true;
+      statusEl.textContent = 'Uploaded \u2713 (' + file.name + ')';
+    }catch(err){
+      statusEl.textContent = 'Upload failed: ' + err.message;
+    }
+  }
+
+  document.getElementById('videoFile').addEventListener('change', (e) =>
+    handleMediaUpload(e, 'video.mp4', 'videoStatus', 'video', null));
+  document.getElementById('gif1File').addEventListener('change', (e) =>
+    handleMediaUpload(e, 'img-1.gif', 'gif1Status', 'gif1', 'thumb1'));
+  document.getElementById('gif2File').addEventListener('change', (e) =>
+    handleMediaUpload(e, 'img-2.gif', 'gif2Status', 'gif2', 'thumb2'));
+
+  document.getElementById('publishBtn').addEventListener('click', async () => {
+    const statusEl = document.getElementById('publishStatus');
+    try{
+      statusEl.textContent = 'Publishing...';
+      await persistGithubSettings();
+      const { owner, repo, branch } = getGithubFields();
+      const data = {
+        videoUrl: mediaExists.video ? rawUrl('video.mp4') : '',
+        gif1Url: mediaExists.gif1 ? rawUrl('img-1.gif') : '',
+        gif2Url: mediaExists.gif2 ? rawUrl('img-2.gif') : '',
+        openDate: document.getElementById('openDate').value,
+        revealMessage: document.getElementById('revealMsg').value.trim() || 'Happy Birthday',
+        recipientName: document.getElementById('recipientName').value.trim(),
+      };
+      const base64Json = utf8ToBase64(JSON.stringify(data, null, 2));
+      await commitFilesToRepo([{ path: 'data.json', base64Content: base64Json }], 'Update data.json');
+
+      const mirrorConfig = Object.assign({}, data, { ghOwner: owner, ghRepo: repo, ghBranch: branch });
+      await saveConfig(mirrorConfig);
+      updateMediaStatusDisplay();
+
+      statusEl.textContent = 'Published \u2713';
+      previewMode = false;
+      render();
+      setTimeout(() => { statusEl.textContent = ''; }, 3000);
+    }catch(err){
+      statusEl.textContent = 'Publish failed: ' + err.message;
+    }
+  });
+
+  document.getElementById('previewBtn').addEventListener('click', () => {
+    if(!config){
+      document.getElementById('publishStatus').textContent = 'Publish your settings first.';
+      return;
+    }
+    previewMode = true;
+    adminModal.classList.remove('open');
+    render();
+  });
+
+  // ---------- boot ----------
+  (async function init(){
+    await loadConfig();
+    await fetchPublishedData();
+    render();
+  })();
+})();
+</script>
+
+</body>
+</html>
