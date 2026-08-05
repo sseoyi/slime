@@ -331,23 +331,6 @@
       <button class="start-btn" id="startBtn">start</button>
     </div>
   </div>
-
-  <div class="screen" id="screen-video">
-    <video id="mainVideo" playsinline></video>
-    <button class="play-overlay" id="playBtn" aria-label="Play video">&#9654;</button>
-  </div>
-
-  <div class="screen" id="screen-gif">
-    <img id="gifImg" alt="Tap to continue">
-    <div class="gif-hint">🎁 tap 🎁</div>
-  </div>
-</div>
-
-<div id="whiteOverlay">
-  <div class="reveal-content" id="revealContent">
-    <div id="revealMessage">Happy Birthday</div>
-    <div id="revealName"></div>
-  </div>
 </div>
 
 <button id="adminGear" aria-label="Admin settings" title="Admin settings">&#9881;</button>
@@ -421,7 +404,7 @@
       <div class="field">
         <label for="openDate">Open date</label>
         <input type="date" id="openDate">
-        <div class="hint">Before this date, visitors see a countdown instead of the content.</div>
+        <div class="hint">Before this date, visitors see a countdown instead of the content page.</div>
       </div>
 
       <div class="field">
@@ -437,7 +420,7 @@
       <button class="btn" id="publishBtn">Publish data.json to GitHub</button>
       <div class="save-msg" id="publishStatus"></div>
 
-      <button class="btn secondary" id="previewBtn">Preview experience now</button>
+      <button class="btn secondary" id="previewBtn">Preview content page now</button>
       <div class="save-msg" id="saveMsg"></div>
       <button class="btn ghost" id="lockBtn">Lock admin panel</button>
     </div>
@@ -453,18 +436,17 @@
   const DEFAULT_GH_REPO = 'slime';
   const DEFAULT_GH_BRANCH = 'main';
   const GH_SETTINGS_KEY = 'github-settings';
+  // Where the content page lives relative to this file.
+  const CONTENT_URL = 'content/index.html';
 
   const screens = {
     loading: document.getElementById('screen-loading'),
     empty: document.getElementById('screen-empty'),
     countdown: document.getElementById('screen-countdown'),
     dday: document.getElementById('screen-dday'),
-    video: document.getElementById('screen-video'),
-    gif: document.getElementById('screen-gif'),
   };
 
   let config = null;
-  let previewMode = false;
   let mediaExists = { video:false, gif1:false, gif2:false };
 
   // ambient falling stars
@@ -721,7 +703,7 @@
 
   function render(){
     const targetDate = (config && config.openDate) ? config.openDate : DEFAULT_OPEN_DATE;
-    const daysLeft = previewMode ? 0 : daysUntil(targetDate);
+    const daysLeft = daysUntil(targetDate);
     const hasMedia = config && (config.videoUrl || config.gif1Url || config.gif2Url);
 
     if(daysLeft > 0){
@@ -760,76 +742,14 @@
       const onFlipEnd = (e) => {
         if(e.propertyName !== 'transform') return;
         ddayContent.removeEventListener('transitionend', onFlipEnd);
-        startExperience();
+        goToContent();
       };
       ddayContent.addEventListener('transitionend', onFlipEnd);
     };
   }
 
-  function startExperience(){
-    if(config.videoUrl){
-      const video = document.getElementById('mainVideo');
-      const playBtn = document.getElementById('playBtn');
-      video.src = config.videoUrl;
-      video.muted = false;
-      video.controls = false;
-
-      playBtn.classList.remove('hidden');
-      playBtn.onclick = () => {
-        video.play().then(() => {
-          playBtn.classList.add('hidden');
-          video.controls = true;
-        }).catch(() => {
-          video.controls = true;
-        });
-      };
-      video.onended = () => {
-        showScreen('gif');
-        startGifStage();
-      };
-      showScreen('video');
-    } else {
-      showScreen('gif');
-      startGifStage();
-    }
-  }
-
-  function startGifStage(){
-    const gifImg = document.getElementById('gifImg');
-    const gifScreen = document.getElementById('screen-gif');
-    const hint = document.querySelector('.gif-hint');
-    gifImg.src = config.gif1Url || '';
-    hint.style.display = config.gif1Url ? '' : 'none';
-    gifScreen.classList.remove('switched');
-
-    let switched = false;
-    gifScreen.onclick = () => {
-      if(switched) return;
-      switched = true;
-      hint.style.display = 'none';
-      if(config.gif2Url){
-        gifImg.src = config.gif2Url;
-      }
-      gifScreen.classList.add('switched');
-      triggerReveal();
-    };
-  }
-
-  function triggerReveal(){
-    const overlay = document.getElementById('whiteOverlay');
-    const content = document.getElementById('revealContent');
-    document.getElementById('revealMessage').textContent = (config.revealMessage && config.revealMessage.trim()) || 'Happy Birthday';
-    document.getElementById('revealName').textContent = config.recipientName || '';
-
-    setTimeout(() => {
-      overlay.classList.add('show');
-      const onEnd = (e) => {
-        if(e.propertyName !== 'opacity') return;
-        overlay.removeEventListener('transitionend', onEnd);
-        content.classList.add('show');
-      };
-      overlay.addEventListener('transitionend', onEnd);
-    }, 1600);
+  function goToContent(){
+    window.location.href = CONTENT_URL;
   }
 
   // ---------- admin ----------
@@ -954,7 +874,6 @@
       updateMediaStatusDisplay();
 
       statusEl.textContent = 'Published \u2713';
-      previewMode = false;
       render();
       setTimeout(() => { statusEl.textContent = ''; }, 3000);
     }catch(err){
@@ -967,9 +886,8 @@
       document.getElementById('publishStatus').textContent = 'Publish your settings first.';
       return;
     }
-    previewMode = true;
     adminModal.classList.remove('open');
-    render();
+    window.location.href = CONTENT_URL + '?preview=1';
   });
 
   // ---------- boot ----------
