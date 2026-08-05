@@ -352,7 +352,7 @@
 
     <div id="adminForm" hidden>
       <h2>Site settings</h2>
-      <p class="sub">Uploads go straight into your GitHub repo. Anyone who opens this site reads from data.json there.</p>
+      <p class="sub">This page only controls when the content unlocks. Media and reveal text are set on the content page itself.</p>
 
       <div class="section-label">GitHub repo</div>
 
@@ -374,32 +374,7 @@
       </div>
 
       <hr class="section-divider">
-      <div class="section-label">Media</div>
-
-      <div class="field">
-        <label for="videoFile">Video</label>
-        <input type="file" id="videoFile" accept="video/*">
-        <div class="hint" id="videoStatus">Not uploaded yet</div>
-      </div>
-
-      <div class="field">
-        <label for="gif1File">First image / GIF (transparent)</label>
-        <input type="file" id="gif1File" accept="image/*">
-        <div class="hint" id="gif1Status">Not uploaded yet</div>
-      </div>
-
-      <div class="field">
-        <label for="gif2File">Second image / GIF</label>
-        <input type="file" id="gif2File" accept="image/*">
-        <div class="hint" id="gif2Status">Not uploaded yet</div>
-        <div class="thumb-row">
-          <img id="thumb1" alt="">
-          <img id="thumb2" alt="">
-        </div>
-      </div>
-
-      <hr class="section-divider">
-      <div class="section-label">Details</div>
+      <div class="section-label">Date</div>
 
       <div class="field">
         <label for="openDate">Open date</label>
@@ -407,17 +382,7 @@
         <div class="hint">Before this date, visitors see a countdown instead of the content page.</div>
       </div>
 
-      <div class="field">
-        <label for="revealMsg">Reveal text</label>
-        <input type="text" id="revealMsg" placeholder="Happy Birthday">
-      </div>
-
-      <div class="field">
-        <label for="recipientName">Reveal subtitle (optional)</label>
-        <input type="text" id="recipientName" placeholder="e.g. a name, or a small line">
-      </div>
-
-      <button class="btn" id="publishBtn">Publish data.json to GitHub</button>
+      <button class="btn" id="publishBtn">Publish date to GitHub</button>
       <div class="save-msg" id="publishStatus"></div>
 
       <button class="btn secondary" id="previewBtn">Preview content page now</button>
@@ -438,6 +403,9 @@
   const GH_SETTINGS_KEY = 'github-settings';
   // Where the content page lives relative to this file.
   const CONTENT_URL = 'content/index.html';
+  // Content page publishes its own resource config here — read-only from this
+  // page, just to know whether there's anything to show once D-day arrives.
+  const CONTENT_DATA_PATH = 'content/res/data.json';
 
   const screens = {
     loading: document.getElementById('screen-loading'),
@@ -447,7 +415,7 @@
   };
 
   let config = null;
-  let mediaExists = { video:false, gif1:false, gif2:false };
+  let contentHasMedia = false;
 
   // ambient falling stars
   (function spawnPetals(){
@@ -500,9 +468,6 @@
   // window.storage only exists inside Claude's artifact preview. Once this file
   // is deployed as a real standalone page (GitHub Pages, opened directly, etc.)
   // that object doesn't exist, so we fall back to localStorage transparently.
-  // NOTE: localStorage has no "shared" concept — it's just per-browser, which is
-  // fine for the token (private either way) but means a deployed site's config
-  // has to be published via data.json for other visitors to see it (which it is).
   const LOCAL_PREFIX = 'birthday-site::';
   function hasArtifactStorage(){
     return typeof window.storage !== 'undefined' && window.storage && typeof window.storage.get === 'function';
@@ -566,22 +531,8 @@
     };
   }
 
-  function rawUrl(path){
-    const { owner, repo, branch } = getGithubFields();
-    return 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + branch + '/' + path;
-  }
-
   function cacheBust(url){
     return url + (url.indexOf('?') === -1 ? '?' : '&') + 't=' + Date.now();
-  }
-
-  function fileToBase64(file){
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result).split(',')[1]);
-      reader.onerror = () => reject(new Error('Could not read file'));
-      reader.readAsDataURL(file);
-    });
   }
 
   function utf8ToBase64(str){
@@ -607,8 +558,6 @@
     return res.json();
   }
 
-  // Commits one or more files (as base64 content) to the repo in a single commit,
-  // using the Git Data API so files well over 1MB (like video) work reliably.
   async function commitFilesToRepoOnce(files, message){
     const { token, owner, repo, branch } = getGithubFields();
     if(!token) throw new Error('Add a GitHub access token first.');
@@ -655,8 +604,6 @@
 
   function sleep(ms){ return new Promise((resolve) => setTimeout(resolve, ms)); }
 
-  // Retries a commit a few times if the branch ref moved underneath us
-  // (e.g. another upload landed between our ref read and our ref update).
   async function commitFilesToRepoWithRetry(files, message){
     const maxAttempts = 5;
     let lastErr;
@@ -666,23 +613,20 @@
       }catch(err){
         lastErr = err;
         if(!isFastForwardConflict(err) || attempt === maxAttempts) throw err;
-        await sleep(300 * attempt); // brief backoff, then re-read the ref and retry
+        await sleep(300 * attempt);
       }
     }
     throw lastErr;
   }
 
-  // Serializes all repo commits so uploads picked at nearly the same time
-  // (video + gif, or two gifs) never race each other's branch ref update.
   let githubCommitQueue = Promise.resolve();
   function commitFilesToRepo(files, message){
     const run = githubCommitQueue.then(() => commitFilesToRepoWithRetry(files, message));
-    // swallow so a failed commit doesn't permanently jam the queue for the next one
     githubCommitQueue = run.catch(() => {});
     return run;
   }
 
-  // Reads the published data.json straight from the repo (no token needed for a public repo).
+  // Reads this page's own published data.json (openDate) straight from the repo.
   async function fetchPublishedData(){
     const owner = (config && config.ghOwner) || DEFAULT_GH_OWNER;
     const repo = (config && config.ghRepo) || DEFAULT_GH_REPO;
@@ -693,18 +637,31 @@
       if(!res.ok) return;
       const data = await res.json();
       config = Object.assign({}, config, data, { ghOwner: owner, ghRepo: repo, ghBranch: branch });
-      mediaExists.video = !!data.videoUrl;
-      mediaExists.gif1 = !!data.gif1Url;
-      mediaExists.gif2 = !!data.gif2Url;
     }catch(e){
       // no data.json published yet, or the repo/branch is unreachable — fall back silently
+    }
+  }
+
+  // Read-only peek at the content page's own resource config, just to know
+  // whether there's anything published to show once D-day arrives.
+  async function fetchContentMediaStatus(){
+    const owner = (config && config.ghOwner) || DEFAULT_GH_OWNER;
+    const repo = (config && config.ghRepo) || DEFAULT_GH_REPO;
+    const branch = (config && config.ghBranch) || DEFAULT_GH_BRANCH;
+    const url = 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + branch + '/' + CONTENT_DATA_PATH;
+    try{
+      const res = await fetch(cacheBust(url));
+      if(!res.ok) return;
+      const data = await res.json();
+      contentHasMedia = !!(data.videoUrl || data.gif1Url || data.gif2Url);
+    }catch(e){
+      // content page hasn't published anything yet
     }
   }
 
   function render(){
     const targetDate = (config && config.openDate) ? config.openDate : DEFAULT_OPEN_DATE;
     const daysLeft = daysUntil(targetDate);
-    const hasMedia = config && (config.videoUrl || config.gif1Url || config.gif2Url);
 
     if(daysLeft > 0){
       document.getElementById('countdownDigits').textContent = 'D-' + daysLeft;
@@ -714,7 +671,7 @@
       return;
     }
 
-    if(!hasMedia){
+    if(!contentHasMedia){
       document.getElementById('emptyDday').textContent = 'D-' + Math.max(daysLeft, 0);
       showScreen('empty');
       return;
@@ -732,7 +689,7 @@
     ddayContent.classList.remove('flip-out');
     ddayText.classList.remove('pop');
     startBtn.classList.remove('show');
-    void ddayContent.offsetWidth; // force reflow so the pop-in animation replays
+    void ddayContent.offsetWidth;
     ddayText.classList.add('pop');
 
     setTimeout(() => { startBtn.classList.add('show'); }, 750);
@@ -742,14 +699,10 @@
       const onFlipEnd = (e) => {
         if(e.propertyName !== 'transform') return;
         ddayContent.removeEventListener('transitionend', onFlipEnd);
-        goToContent();
+        window.location.href = CONTENT_URL;
       };
       ddayContent.addEventListener('transitionend', onFlipEnd);
     };
-  }
-
-  function goToContent(){
-    window.location.href = CONTENT_URL;
   }
 
   // ---------- admin ----------
@@ -810,47 +763,11 @@
     document.getElementById('ghRepo').value = gh.repo || c.ghRepo || DEFAULT_GH_REPO;
     document.getElementById('ghBranch').value = gh.branch || c.ghBranch || DEFAULT_GH_BRANCH;
     document.getElementById('openDate').value = c.openDate || DEFAULT_OPEN_DATE;
-    document.getElementById('revealMsg').value = c.revealMessage || 'Happy Birthday';
-    document.getElementById('recipientName').value = c.recipientName || '';
-    updateMediaStatusDisplay();
-  }
-
-  function updateMediaStatusDisplay(){
-    const c = config || {};
-    document.getElementById('videoStatus').textContent = mediaExists.video ? 'Published \u2713 (video.mp4)' : 'Not uploaded yet';
-    document.getElementById('gif1Status').textContent = mediaExists.gif1 ? 'Published \u2713 (img-1.gif)' : 'Not uploaded yet';
-    document.getElementById('gif2Status').textContent = mediaExists.gif2 ? 'Published \u2713 (img-2.gif)' : 'Not uploaded yet';
-    document.getElementById('thumb1').src = c.gif1Url || '';
-    document.getElementById('thumb2').src = c.gif2Url || '';
   }
 
   ['ghToken','ghOwner','ghRepo','ghBranch'].forEach((id) => {
     document.getElementById(id).addEventListener('change', persistGithubSettings);
   });
-
-  async function handleMediaUpload(e, path, statusId, mediaKey, thumbId){
-    const file = e.target.files[0];
-    if(!file) return;
-    const statusEl = document.getElementById(statusId);
-    if(thumbId){ document.getElementById(thumbId).src = URL.createObjectURL(file); }
-    statusEl.textContent = 'Uploading ' + path + '...';
-    try{
-      await persistGithubSettings();
-      const base64 = await fileToBase64(file);
-      await commitFilesToRepo([{ path: path, base64Content: base64 }], 'Update ' + path);
-      mediaExists[mediaKey] = true;
-      statusEl.textContent = 'Uploaded \u2713 (' + file.name + ')';
-    }catch(err){
-      statusEl.textContent = 'Upload failed: ' + err.message;
-    }
-  }
-
-  document.getElementById('videoFile').addEventListener('change', (e) =>
-    handleMediaUpload(e, 'video.mp4', 'videoStatus', 'video', null));
-  document.getElementById('gif1File').addEventListener('change', (e) =>
-    handleMediaUpload(e, 'img-1.gif', 'gif1Status', 'gif1', 'thumb1'));
-  document.getElementById('gif2File').addEventListener('change', (e) =>
-    handleMediaUpload(e, 'img-2.gif', 'gif2Status', 'gif2', 'thumb2'));
 
   document.getElementById('publishBtn').addEventListener('click', async () => {
     const statusEl = document.getElementById('publishStatus');
@@ -859,19 +776,13 @@
       await persistGithubSettings();
       const { owner, repo, branch } = getGithubFields();
       const data = {
-        videoUrl: mediaExists.video ? rawUrl('video.mp4') : '',
-        gif1Url: mediaExists.gif1 ? rawUrl('img-1.gif') : '',
-        gif2Url: mediaExists.gif2 ? rawUrl('img-2.gif') : '',
         openDate: document.getElementById('openDate').value,
-        revealMessage: document.getElementById('revealMsg').value.trim() || 'Happy Birthday',
-        recipientName: document.getElementById('recipientName').value.trim(),
       };
       const base64Json = utf8ToBase64(JSON.stringify(data, null, 2));
       await commitFilesToRepo([{ path: 'data.json', base64Content: base64Json }], 'Update data.json');
 
       const mirrorConfig = Object.assign({}, data, { ghOwner: owner, ghRepo: repo, ghBranch: branch });
       await saveConfig(mirrorConfig);
-      updateMediaStatusDisplay();
 
       statusEl.textContent = 'Published \u2713';
       render();
@@ -882,10 +793,6 @@
   });
 
   document.getElementById('previewBtn').addEventListener('click', () => {
-    if(!config){
-      document.getElementById('publishStatus').textContent = 'Publish your settings first.';
-      return;
-    }
     adminModal.classList.remove('open');
     window.location.href = CONTENT_URL + '?preview=1';
   });
@@ -894,6 +801,7 @@
   (async function init(){
     await loadConfig();
     await fetchPublishedData();
+    await fetchContentMediaStatus();
     render();
   })();
 })();
