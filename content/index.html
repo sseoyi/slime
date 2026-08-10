@@ -655,21 +655,58 @@
     }catch(e){ /* not published yet */ }
   }
 
-  // Reads this page's own published resource config.
+  // Checks whether a raw file actually exists in the repo (HEAD request).
+  async function fileExists(url){
+    try{
+      const res = await fetch(cacheBust(url), { method:'HEAD' });
+      if(res.ok) return true;
+      // Some hosts/proxies don't support HEAD well — fall back to GET.
+      if(res.status === 405){
+        const res2 = await fetch(cacheBust(url));
+        return res2.ok;
+      }
+      return false;
+    }catch(e){
+      return false;
+    }
+  }
+
+  // Reads this page's own published resource config (data.json, for the
+  // reveal text etc.), then ALSO auto-detects media files directly in
+  // content/res so uploading is enough on its own — no separate "Publish"
+  // step required just to get the video/gifs to show.
   async function fetchContentData(){
     const owner = (config && config.ghOwner) || DEFAULT_GH_OWNER;
     const repo = (config && config.ghRepo) || DEFAULT_GH_REPO;
     const branch = (config && config.ghBranch) || DEFAULT_GH_BRANCH;
-    const url = 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + branch + '/' + RES_DIR + 'data.json';
+    const dataUrl = 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + branch + '/' + RES_DIR + 'data.json';
+
+    let data = {};
     try{
-      const res = await fetch(cacheBust(url));
-      if(!res.ok) return;
-      const data = await res.json();
-      config = Object.assign({}, config, data, { ghOwner: owner, ghRepo: repo, ghBranch: branch });
-      mediaExists.video = !!data.videoUrl;
-      mediaExists.gif1 = !!data.gif1Url;
-      mediaExists.gif2 = !!data.gif2Url;
-    }catch(e){ /* nothing published yet */ }
+      const res = await fetch(cacheBust(dataUrl));
+      if(res.ok) data = await res.json();
+    }catch(e){ /* nothing published yet — that's fine, we still auto-detect media below */ }
+
+    config = Object.assign({}, config, data, { ghOwner: owner, ghRepo: repo, ghBranch: branch });
+
+    // Auto-detect each media file directly, regardless of what data.json says.
+    const videoUrlGuess = 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + branch + '/' + RES_DIR + 'video.mp4';
+    const gif1UrlGuess = 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + branch + '/' + RES_DIR + 'img-1.gif';
+    const gif2UrlGuess = 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + branch + '/' + RES_DIR + 'img-2.gif';
+
+    const [videoFound, gif1Found, gif2Found] = await Promise.all([
+      fileExists(videoUrlGuess),
+      fileExists(gif1UrlGuess),
+      fileExists(gif2UrlGuess),
+    ]);
+
+    mediaExists.video = videoFound;
+    mediaExists.gif1 = gif1Found;
+    mediaExists.gif2 = gif2Found;
+
+    config.videoUrl = videoFound ? videoUrlGuess : '';
+    config.gif1Url = gif1Found ? gif1UrlGuess : '';
+    config.gif2Url = gif2Found ? gif2UrlGuess : '';
   }
 
   function hasMedia(){
