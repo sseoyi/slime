@@ -322,6 +322,7 @@
   <div class="screen" id="screen-video">
     <video id="mainVideo" playsinline></video>
     <button class="play-overlay" id="playBtn" aria-label="Play video">&#9654;</button>
+    <div class="hint" id="videoError" style="display:none; position:absolute; bottom:24px; left:0; right:0; text-align:center; color:#fff;"></div>
   </div>
 
   <div class="screen" id="screen-gif">
@@ -717,17 +718,33 @@
     if(config.videoUrl){
       const video = document.getElementById('mainVideo');
       const playBtn = document.getElementById('playBtn');
+      const errEl = document.getElementById('videoError');
       video.src = config.videoUrl;
       video.muted = false;
       video.controls = false;
+
+      video.onerror = () => {
+        const code = video.error ? video.error.code : 0;
+        // 1=aborted 2=network 3=decode(corrupt/unsupported) 4=src not supported
+        errEl.textContent = code === 3 || code === 4
+          ? 'This video file can\'t be played — it may be corrupted or an unsupported format. Try re-uploading a smaller/standard H.264 MP4.'
+          : 'Couldn\'t load the video (network error). Check the file exists at the expected path and try again.';
+        errEl.style.display = 'block';
+        playBtn.classList.add('hidden');
+      };
 
       playBtn.classList.remove('hidden');
       playBtn.onclick = () => {
         video.play().then(() => {
           playBtn.classList.add('hidden');
           video.controls = true;
-        }).catch(() => {
+        }).catch((err) => {
+          // Always hide the overlay on failure too, so it doesn't sit on
+          // top masking whatever state the video is actually in.
+          playBtn.classList.add('hidden');
           video.controls = true;
+          errEl.textContent = 'Playback failed: ' + err.message;
+          errEl.style.display = 'block';
         });
       };
       video.onended = () => {
