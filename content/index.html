@@ -225,87 +225,6 @@
     font-size:1rem; color:var(--ink-dim);
   }
 
-  /* ---------- admin gear ---------- */
-  #adminGear{
-    position:fixed; right:18px; bottom:16px; z-index:100;
-    width:32px; height:32px; border-radius:50%;
-    background:#fff; border:1px solid var(--line); color:var(--ink-faint);
-    font-size:0.95rem; cursor:pointer; opacity:0.35;
-    transition:opacity 0.3s ease, transform 0.3s ease;
-  }
-  #adminGear:hover{ opacity:1; transform:rotate(40deg); color:var(--pink-deep); }
-
-  /* ---------- admin modal ---------- */
-  .modal-overlay{
-    position:fixed; inset:0; z-index:200;
-    background:rgba(91,70,64,0.35);
-    display:none; align-items:center; justify-content:center;
-    padding:24px;
-    backdrop-filter:blur(3px);
-  }
-  .modal-overlay.open{ display:flex; }
-  .modal{
-    width:100%; max-width:460px; max-height:88vh; overflow-y:auto;
-    background:var(--panel); border:1px solid var(--line); border-radius:22px;
-    padding:28px 26px;
-  }
-  .modal h2{
-    font-family:'Klee One', cursive; font-weight:600; font-size:1.35rem; margin:0 0 6px;
-    color:var(--pink-deep);
-  }
-  .modal p.sub{ margin:0 0 22px; color:var(--ink-dim); font-size:0.85rem; line-height:1.5; }
-  .field{ margin-bottom:16px; text-align:left; }
-  .field label{
-    display:block; font-family:'Zen Maru Gothic', sans-serif; font-size:0.72rem;
-    letter-spacing:0.04em; color:var(--ink-dim); margin-bottom:7px;
-  }
-  .field input[type=text], .field input[type=date], .field input[type=password]{
-    width:100%; padding:10px 14px; border-radius:14px; border:1px solid var(--line);
-    background:var(--bg-2); color:var(--ink); font-family:'Zen Maru Gothic',sans-serif; font-size:0.9rem;
-    outline:none; transition:border-color 0.2s ease;
-  }
-  .field input:focus{ border-color:var(--pink); }
-  .field .hint{ margin-top:6px; font-size:0.74rem; color:var(--ink-faint); line-height:1.5; }
-  .thumb-row{ display:flex; gap:10px; margin-top:8px; }
-  .thumb-row img{
-    width:52px; height:52px; object-fit:contain; border-radius:12px;
-    background:repeating-conic-gradient(#fff0ea 0% 25%, #ffe3e8 0% 50%) 0 0/12px 12px;
-    border:1px solid var(--line);
-  }
-  .gh-row{ display:flex; gap:8px; }
-  .gh-row input{ flex:1; min-width:0; }
-  .field input[type=file]{
-    width:100%; padding:9px 10px; border-radius:14px; border:1px solid var(--line);
-    background:var(--bg-2); color:var(--ink); font-family:'Zen Maru Gothic',sans-serif; font-size:0.8rem;
-  }
-  .section-divider{
-    margin:22px 0 18px; border:none; border-top:1px dashed var(--line);
-  }
-  .section-label{
-    font-family:'Zen Maru Gothic', sans-serif; font-weight:700; font-size:0.72rem;
-    letter-spacing:0.1em; text-transform:uppercase; color:var(--pink-deep); margin-bottom:14px;
-  }
-  .btn{
-    width:100%; padding:12px 14px; border-radius:999px; border:none; cursor:pointer;
-    font-family:'Zen Maru Gothic',sans-serif; font-weight:700; font-size:0.88rem;
-    background:var(--pink-deep); color:#fff; transition:opacity 0.2s ease, transform 0.15s ease;
-  }
-  .btn:hover{ opacity:0.9; transform:translateY(-1px); }
-  .btn.secondary{
-    background:#fff; color:var(--pink-deep); border:1.5px solid var(--pink); margin-top:10px;
-  }
-  .btn.ghost{
-    background:transparent; color:var(--ink-faint); border:none; margin-top:14px;
-    font-weight:500; font-size:0.78rem; text-decoration:underline;
-  }
-  .modal-close{
-    float:right; background:none; border:none; color:var(--ink-faint); font-size:1.2rem; cursor:pointer;
-  }
-  .save-msg{
-    margin-top:12px; font-size:0.8rem; color:var(--pink-deep); text-align:center; min-height:1em;
-  }
-  .error-msg{ color:var(--coral); font-size:0.8rem; margin-top:8px; min-height:1em; }
-  .clearfix::after{ content:""; display:block; clear:both; }
 </style>
 </head>
 <body>
@@ -338,104 +257,12 @@
   </div>
 </div>
 
-<button id="adminGear" aria-label="Admin settings" title="Admin settings">&#9881;</button>
-
-<div class="modal-overlay" id="adminModal">
-  <div class="modal">
-    <button class="modal-close clearfix" id="closeModal" aria-label="Close">&times;</button>
-
-    <div id="adminAuth">
-      <h2>Admin access</h2>
-      <p class="sub">Enter the password to edit this page.</p>
-      <div class="field">
-        <label for="pwInput">Password</label>
-        <input type="password" id="pwInput" autocomplete="off">
-      </div>
-      <button class="btn" id="pwSubmit">Unlock</button>
-      <div class="error-msg" id="pwError"></div>
-    </div>
-
-    <div id="adminForm" hidden>
-      <h2>Content settings</h2>
-      <p class="sub">Uploads go straight into your GitHub repo, under content/res. The open date itself is set on the countdown page.</p>
-
-      <div class="section-label">GitHub repo</div>
-
-      <div class="field">
-        <label for="ghOwner">Owner &amp; repo</label>
-        <div class="gh-row">
-          <input type="text" id="ghOwner" placeholder="owner">
-          <input type="text" id="ghRepo" placeholder="repo">
-        </div>
-        <div class="gh-row" style="margin-top:8px;">
-          <input type="text" id="ghBranch" placeholder="branch">
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="ghToken">Access token</label>
-        <input type="password" id="ghToken" placeholder="ghp_...">
-        <div class="hint">Needs repo write access. Kept on this device across refreshes.</div>
-      </div>
-
-      <hr class="section-divider">
-      <div class="section-label">Media</div>
-
-      <div class="field">
-        <label for="videoFile">Video</label>
-        <input type="file" id="videoFile" accept="video/*">
-        <div class="hint" id="videoStatus">Not uploaded yet</div>
-      </div>
-
-      <div class="field">
-        <label for="gif1File">First image / GIF (transparent)</label>
-        <input type="file" id="gif1File" accept="image/*">
-        <div class="hint" id="gif1Status">Not uploaded yet</div>
-      </div>
-
-      <div class="field">
-        <label for="gif2File">Second image / GIF</label>
-        <input type="file" id="gif2File" accept="image/*">
-        <div class="hint" id="gif2Status">Not uploaded yet</div>
-        <div class="thumb-row">
-          <img id="thumb1" alt="">
-          <img id="thumb2" alt="">
-        </div>
-      </div>
-
-      <hr class="section-divider">
-      <div class="section-label">Details</div>
-
-      <div class="field">
-        <label for="revealMsg">Reveal text</label>
-        <input type="text" id="revealMsg" placeholder="Happy Birthday">
-      </div>
-
-      <div class="field">
-        <label for="recipientName">Reveal subtitle (optional)</label>
-        <input type="text" id="recipientName" placeholder="e.g. a name, or a small line">
-      </div>
-
-      <button class="btn" id="publishBtn">Publish to GitHub</button>
-      <div class="save-msg" id="publishStatus"></div>
-
-      <button class="btn secondary" id="previewBtn">Preview experience now</button>
-      <div class="save-msg" id="saveMsg"></div>
-      <button class="btn ghost" id="lockBtn">Lock admin panel</button>
-    </div>
-  </div>
-</div>
-
 <script>
 (function(){
-  const ADMIN_PASSWORD = 'ssi551';
-  const DEFAULT_OPEN_DATE = '2026-08-12';
-  const DEFAULT_GH_OWNER = 'sseoyi';
-  const DEFAULT_GH_REPO = 'slime';
-  const DEFAULT_GH_BRANCH = 'main';
-  const GH_SETTINGS_KEY = 'github-settings';
-  // Where the countdown page (with the date setting) lives relative to this file.
-  const COUNTDOWN_URL = '../index.html';
+  // Media always lives here — no admin panel, nothing to configure.
+  const GH_OWNER = 'sseoyi';
+  const GH_REPO = 'slime';
+  const GH_BRANCH = 'main';
   // This page's own resources live under content/res in the repo.
   const RES_DIR = 'content/res/';
 
@@ -446,8 +273,7 @@
     gif: document.getElementById('screen-gif'),
   };
 
-  let rootConfig = null;   // { openDate } — published by the countdown page
-  let config = null;       // { videoUrl, gif1Url, gif2Url, revealMessage, recipientName } — owned here
+  let config = null;       // { videoUrl, gif1Url, gif2Url, revealMessage, recipientName }
   let mediaExists = { video:false, gif1:false, gif2:false };
 
   // ambient falling stars
@@ -476,184 +302,12 @@
     screens[name].classList.add('active');
   }
 
-  function parseLocalDate(dateStr){
-    if(!dateStr) return null;
-    const [y,m,d] = dateStr.split('-').map(Number);
-    if(!y||!m||!d) return null;
-    return new Date(y, m-1, d);
-  }
-
-  function daysUntil(dateStr){
-    const target = parseLocalDate(dateStr);
-    if(!target) return 0;
-    const now = new Date();
-    const todayMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const diffMs = target - todayMid;
-    return Math.ceil(diffMs / 86400000);
-  }
-
-  const LOCAL_PREFIX = 'birthday-site::';
-  function hasArtifactStorage(){
-    return typeof window.storage !== 'undefined' && window.storage && typeof window.storage.get === 'function';
-  }
-  async function storageGet(key, shared){
-    if(hasArtifactStorage()){
-      return window.storage.get(key, shared).catch(() => null);
-    }
-    const raw = localStorage.getItem(LOCAL_PREFIX + key);
-    return raw === null ? null : { key, value: raw };
-  }
-  async function storageSet(key, value, shared){
-    if(hasArtifactStorage()){
-      return window.storage.set(key, value, shared);
-    }
-    localStorage.setItem(LOCAL_PREFIX + key, value);
-    return { key, value };
-  }
-
-  // ---------- github integration ----------
-  async function loadGithubSettings(){
-    try{
-      const res = await storageGet(GH_SETTINGS_KEY, false);
-      if(res && res.value) return JSON.parse(res.value);
-    }catch(e){ /* nothing saved yet */ }
-    return {};
-  }
-
-  async function persistGithubSettings(){
-    const fields = getGithubFields();
-    try{
-      await storageSet(GH_SETTINGS_KEY, JSON.stringify(fields), false);
-    }catch(e){ /* best effort — token stays in the field either way */ }
-  }
-
-  function getGithubFields(){
-    return {
-      token: document.getElementById('ghToken').value.trim(),
-      owner: document.getElementById('ghOwner').value.trim() || DEFAULT_GH_OWNER,
-      repo: document.getElementById('ghRepo').value.trim() || DEFAULT_GH_REPO,
-      branch: document.getElementById('ghBranch').value.trim() || DEFAULT_GH_BRANCH,
-    };
-  }
-
-  function rawUrl(path){
-    const { owner, repo, branch } = getGithubFields();
-    return 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + branch + '/' + path;
-  }
-
   function cacheBust(url){
     return url + (url.indexOf('?') === -1 ? '?' : '&') + 't=' + Date.now();
   }
 
-  function fileToBase64(file){
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result).split(',')[1]);
-      reader.onerror = () => reject(new Error('Could not read file'));
-      reader.readAsDataURL(file);
-    });
-  }
-
-  function utf8ToBase64(str){
-    return btoa(unescape(encodeURIComponent(str)));
-  }
-
-  function ghHeaders(token){
-    return {
-      'Authorization': 'token ' + token,
-      'Accept': 'application/vnd.github+json',
-      'Content-Type': 'application/json',
-    };
-  }
-
-  async function githubRequest(url, options){
-    const res = await fetch(url, options);
-    if(!res.ok){
-      let msg = 'GitHub error (' + res.status + ')';
-      try{ const j = await res.json(); if(j && j.message) msg = j.message; }catch(e){ /* ignore */ }
-      throw new Error(msg);
-    }
-    if(res.status === 204) return null;
-    return res.json();
-  }
-
-  async function commitFilesToRepoOnce(files, message){
-    const { token, owner, repo, branch } = getGithubFields();
-    if(!token) throw new Error('Add a GitHub access token first.');
-    if(!owner || !repo) throw new Error('Add a repo owner and name first.');
-    const base = 'https://api.github.com/repos/' + owner + '/' + repo;
-
-    const refData = await githubRequest(base + '/git/ref/heads/' + branch, { headers: ghHeaders(token) });
-    const latestCommitSha = refData.object.sha;
-
-    const commitData = await githubRequest(base + '/git/commits/' + latestCommitSha, { headers: ghHeaders(token) });
-    const baseTreeSha = commitData.tree.sha;
-
-    const treeEntries = [];
-    for(const f of files){
-      const blob = await githubRequest(base + '/git/blobs', {
-        method: 'POST', headers: ghHeaders(token),
-        body: JSON.stringify({ content: f.base64Content, encoding: 'base64' }),
-      });
-      treeEntries.push({ path: f.path, mode: '100644', type: 'blob', sha: blob.sha });
-    }
-
-    const newTree = await githubRequest(base + '/git/trees', {
-      method: 'POST', headers: ghHeaders(token),
-      body: JSON.stringify({ base_tree: baseTreeSha, tree: treeEntries }),
-    });
-
-    const newCommit = await githubRequest(base + '/git/commits', {
-      method: 'POST', headers: ghHeaders(token),
-      body: JSON.stringify({ message: message, tree: newTree.sha, parents: [latestCommitSha] }),
-    });
-
-    await githubRequest(base + '/git/refs/heads/' + branch, {
-      method: 'PATCH', headers: ghHeaders(token),
-      body: JSON.stringify({ sha: newCommit.sha }),
-    });
-
-    return true;
-  }
-
-  function isFastForwardConflict(err){
-    const msg = (err && err.message || '').toLowerCase();
-    return msg.indexOf('fast forward') !== -1 || msg.indexOf('422') !== -1 || msg.indexOf('reference already exists') !== -1;
-  }
-
-  function sleep(ms){ return new Promise((resolve) => setTimeout(resolve, ms)); }
-
-  async function commitFilesToRepoWithRetry(files, message){
-    const maxAttempts = 5;
-    let lastErr;
-    for(let attempt = 1; attempt <= maxAttempts; attempt++){
-      try{
-        return await commitFilesToRepoOnce(files, message);
-      }catch(err){
-        lastErr = err;
-        if(!isFastForwardConflict(err) || attempt === maxAttempts) throw err;
-        await sleep(300 * attempt);
-      }
-    }
-    throw lastErr;
-  }
-
-  let githubCommitQueue = Promise.resolve();
-  function commitFilesToRepo(files, message){
-    const run = githubCommitQueue.then(() => commitFilesToRepoWithRetry(files, message));
-    githubCommitQueue = run.catch(() => {});
-    return run;
-  }
-
-  // Reads the countdown page's data.json, just for the open date.
-  async function fetchRootData(){
-    const owner = DEFAULT_GH_OWNER, repo = DEFAULT_GH_REPO, branch = DEFAULT_GH_BRANCH;
-    const url = 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + branch + '/data.json';
-    try{
-      const res = await fetch(cacheBust(url));
-      if(!res.ok) return;
-      rootConfig = await res.json();
-    }catch(e){ /* not published yet */ }
+  function rawUrl(path){
+    return 'https://raw.githubusercontent.com/' + GH_OWNER + '/' + GH_REPO + '/' + GH_BRANCH + '/' + path;
   }
 
   // Checks whether a raw file actually exists in the repo (HEAD request).
@@ -672,28 +326,14 @@
     }
   }
 
-  // Reads this page's own published resource config (data.json, for the
-  // reveal text etc.), then ALSO auto-detects media files directly in
-  // content/res so uploading is enough on its own — no separate "Publish"
-  // step required just to get the video/gifs to show.
+  // Auto-detects video.mp4, img-1.gif, and img-2.gif directly in
+  // sseoyi/slime/content/res — nothing to upload or publish through this
+  // page. It also opportunistically reads content/res/data.json for the
+  // reveal text/name, if that file happens to exist in the repo.
   async function fetchContentData(){
-    const owner = (config && config.ghOwner) || DEFAULT_GH_OWNER;
-    const repo = (config && config.ghRepo) || DEFAULT_GH_REPO;
-    const branch = (config && config.ghBranch) || DEFAULT_GH_BRANCH;
-    const dataUrl = 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + branch + '/' + RES_DIR + 'data.json';
-
-    let data = {};
-    try{
-      const res = await fetch(cacheBust(dataUrl));
-      if(res.ok) data = await res.json();
-    }catch(e){ /* nothing published yet — that's fine, we still auto-detect media below */ }
-
-    config = Object.assign({}, config, data, { ghOwner: owner, ghRepo: repo, ghBranch: branch });
-
-    // Auto-detect each media file directly, regardless of what data.json says.
-    const videoUrlGuess = 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + branch + '/' + RES_DIR + 'video.mp4';
-    const gif1UrlGuess = 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + branch + '/' + RES_DIR + 'img-1.gif';
-    const gif2UrlGuess = 'https://raw.githubusercontent.com/' + owner + '/' + repo + '/' + branch + '/' + RES_DIR + 'img-2.gif';
+    const videoUrlGuess = rawUrl(RES_DIR + 'video.mp4');
+    const gif1UrlGuess = rawUrl(RES_DIR + 'img-1.gif');
+    const gif2UrlGuess = rawUrl(RES_DIR + 'img-2.gif');
 
     const [videoFound, gif1Found, gif2Found] = await Promise.all([
       fileExists(videoUrlGuess),
@@ -705,9 +345,19 @@
     mediaExists.gif1 = gif1Found;
     mediaExists.gif2 = gif2Found;
 
-    config.videoUrl = videoFound ? videoUrlGuess : '';
-    config.gif1Url = gif1Found ? gif1UrlGuess : '';
-    config.gif2Url = gif2Found ? gif2UrlGuess : '';
+    let data = {};
+    try{
+      const res = await fetch(cacheBust(rawUrl(RES_DIR + 'data.json')));
+      if(res.ok) data = await res.json();
+    }catch(e){ /* optional — fine if it doesn't exist */ }
+
+    config = {
+      videoUrl: videoFound ? videoUrlGuess : '',
+      gif1Url: gif1Found ? gif1UrlGuess : '',
+      gif2Url: gif2Found ? gif2UrlGuess : '',
+      revealMessage: data.revealMessage,
+      recipientName: data.recipientName,
+    };
   }
 
   function hasMedia(){
@@ -804,141 +454,6 @@
 
     startExperience();
   }
-
-  // ---------- admin ----------
-  const adminGear = document.getElementById('adminGear');
-  const adminModal = document.getElementById('adminModal');
-  const adminAuth = document.getElementById('adminAuth');
-  const adminForm = document.getElementById('adminForm');
-  const pwInput = document.getElementById('pwInput');
-  const pwError = document.getElementById('pwError');
-
-  let authed = false;
-
-  adminGear.addEventListener('click', () => {
-    adminModal.classList.add('open');
-    if(authed){
-      adminAuth.hidden = true;
-      adminForm.hidden = false;
-    } else {
-      adminAuth.hidden = false;
-      adminForm.hidden = true;
-      pwInput.value = '';
-      pwError.textContent = '';
-    }
-  });
-
-  document.getElementById('closeModal').addEventListener('click', () => {
-    adminModal.classList.remove('open');
-  });
-  adminModal.addEventListener('click', (e) => {
-    if(e.target === adminModal) adminModal.classList.remove('open');
-  });
-
-  document.getElementById('pwSubmit').addEventListener('click', tryAuth);
-  pwInput.addEventListener('keydown', (e) => { if(e.key === 'Enter') tryAuth(); });
-
-  function tryAuth(){
-    if(pwInput.value === ADMIN_PASSWORD){
-      authed = true;
-      pwError.textContent = '';
-      adminAuth.hidden = true;
-      adminForm.hidden = false;
-      populateForm();
-    } else {
-      pwError.textContent = 'That password isn\'t right.';
-    }
-  }
-
-  document.getElementById('lockBtn').addEventListener('click', () => {
-    authed = false;
-    adminModal.classList.remove('open');
-  });
-
-  async function populateForm(){
-    const c = config || {};
-    const gh = await loadGithubSettings();
-    document.getElementById('ghToken').value = gh.token || '';
-    document.getElementById('ghOwner').value = gh.owner || c.ghOwner || DEFAULT_GH_OWNER;
-    document.getElementById('ghRepo').value = gh.repo || c.ghRepo || DEFAULT_GH_REPO;
-    document.getElementById('ghBranch').value = gh.branch || c.ghBranch || DEFAULT_GH_BRANCH;
-    document.getElementById('revealMsg').value = c.revealMessage || 'Happy Birthday';
-    document.getElementById('recipientName').value = c.recipientName || '';
-    updateMediaStatusDisplay();
-  }
-
-  function updateMediaStatusDisplay(){
-    const c = config || {};
-    document.getElementById('videoStatus').textContent = mediaExists.video ? 'Published \u2713 (' + RES_DIR + 'video.mp4)' : 'Not uploaded yet';
-    document.getElementById('gif1Status').textContent = mediaExists.gif1 ? 'Published \u2713 (' + RES_DIR + 'img-1.gif)' : 'Not uploaded yet';
-    document.getElementById('gif2Status').textContent = mediaExists.gif2 ? 'Published \u2713 (' + RES_DIR + 'img-2.gif)' : 'Not uploaded yet';
-    document.getElementById('thumb1').src = c.gif1Url || '';
-    document.getElementById('thumb2').src = c.gif2Url || '';
-  }
-
-  ['ghToken','ghOwner','ghRepo','ghBranch'].forEach((id) => {
-    document.getElementById(id).addEventListener('change', persistGithubSettings);
-  });
-
-  async function handleMediaUpload(e, path, statusId, mediaKey, thumbId){
-    const file = e.target.files[0];
-    if(!file) return;
-    const statusEl = document.getElementById(statusId);
-    if(thumbId){ document.getElementById(thumbId).src = URL.createObjectURL(file); }
-    statusEl.textContent = 'Uploading ' + path + '...';
-    try{
-      await persistGithubSettings();
-      const base64 = await fileToBase64(file);
-      await commitFilesToRepo([{ path: path, base64Content: base64 }], 'Update ' + path);
-      mediaExists[mediaKey] = true;
-      statusEl.textContent = 'Uploaded \u2713 (' + file.name + ')';
-    }catch(err){
-      statusEl.textContent = 'Upload failed: ' + err.message;
-    }
-  }
-
-  document.getElementById('videoFile').addEventListener('change', (e) =>
-    handleMediaUpload(e, RES_DIR + 'video.mp4', 'videoStatus', 'video', null));
-  document.getElementById('gif1File').addEventListener('change', (e) =>
-    handleMediaUpload(e, RES_DIR + 'img-1.gif', 'gif1Status', 'gif1', 'thumb1'));
-  document.getElementById('gif2File').addEventListener('change', (e) =>
-    handleMediaUpload(e, RES_DIR + 'img-2.gif', 'gif2Status', 'gif2', 'thumb2'));
-
-  document.getElementById('publishBtn').addEventListener('click', async () => {
-    const statusEl = document.getElementById('publishStatus');
-    try{
-      statusEl.textContent = 'Publishing...';
-      await persistGithubSettings();
-      const { owner, repo, branch } = getGithubFields();
-      const data = {
-        videoUrl: mediaExists.video ? rawUrl(RES_DIR + 'video.mp4') : '',
-        gif1Url: mediaExists.gif1 ? rawUrl(RES_DIR + 'img-1.gif') : '',
-        gif2Url: mediaExists.gif2 ? rawUrl(RES_DIR + 'img-2.gif') : '',
-        revealMessage: document.getElementById('revealMsg').value.trim() || 'Happy Birthday',
-        recipientName: document.getElementById('recipientName').value.trim(),
-      };
-      const base64Json = utf8ToBase64(JSON.stringify(data, null, 2));
-      await commitFilesToRepo([{ path: RES_DIR + 'data.json', base64Content: base64Json }], 'Update ' + RES_DIR + 'data.json');
-
-      config = Object.assign({}, data, { ghOwner: owner, ghRepo: repo, ghBranch: branch });
-      updateMediaStatusDisplay();
-
-      statusEl.textContent = 'Published \u2713';
-      render();
-      setTimeout(() => { statusEl.textContent = ''; }, 3000);
-    }catch(err){
-      statusEl.textContent = 'Publish failed: ' + err.message;
-    }
-  });
-
-  document.getElementById('previewBtn').addEventListener('click', () => {
-    if(!hasMedia()){
-      document.getElementById('publishStatus').textContent = 'Publish some media first.';
-      return;
-    }
-    adminModal.classList.remove('open');
-    startExperience();
-  });
 
   // ---------- boot ----------
   (async function init(){
