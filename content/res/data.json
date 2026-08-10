@@ -1,7 +1,7 @@
 {
-  "videoUrl": "",
+  "videoUrl": "https://raw.githubusercontent.com/sseoyi/slime/main/content/res/video.mp4",
   "gif1Url": "",
-  "gif2Url": "",
+  "gif2Url": "https://raw.githubusercontent.com/sseoyi/slime/main/content/res/img-2.gif",
   "revealMessage": "Happy Birthday",
   "recipientName": ""
 }
