@@ -780,17 +780,8 @@
   }
 
   function render(){
-    const params = new URLSearchParams(window.location.search);
-    const preview = params.get('preview') === '1';
-
     if(!hasMedia()){
       showScreen('empty');
-      return;
-    }
-
-    const targetDate = (rootConfig && rootConfig.openDate) ? rootConfig.openDate : DEFAULT_OPEN_DATE;
-    if(!preview && daysUntil(targetDate) > 0){
-      window.location.href = COUNTDOWN_URL;
       return;
     }
 
@@ -934,7 +925,6 @@
 
   // ---------- boot ----------
   (async function init(){
-    await fetchRootData();
     await fetchContentData();
     render();
   })();
