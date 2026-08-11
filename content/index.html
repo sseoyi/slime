@@ -428,6 +428,7 @@
 
       playBtn.classList.remove('hidden');
       playBtn.onclick = () => {
+        unlockBgm();
         video.play().then(() => {
           playBtn.classList.add('hidden');
           video.controls = true;
@@ -453,20 +454,40 @@
     }
   }
 
+  let bgmUnlocked = false;
+  // "Unlocks" the audio element by playing+immediately pausing it during a
+  // real user tap. Strict browsers (mainly iOS Safari) only allow a media
+  // element to start playing later without a fresh gesture if it has
+  // already been played once during an actual gesture like this.
+  function unlockBgm(){
+    if(bgmUnlocked || !config.bgmUrl) return;
+    bgmUnlocked = true;
+    const bgm = document.getElementById('bgmAudio');
+    if(!bgm.src) bgm.src = config.bgmUrl;
+    const p = bgm.play();
+    if(p && p.catch) p.catch(() => {});
+    bgm.pause();
+    bgm.currentTime = 0;
+  }
+
   function playBgm(){
     if(!config.bgmUrl) return;
     const bgm = document.getElementById('bgmAudio');
-    if(bgm.src) return; // already started
+    if(bgm.src && !bgm.paused) return; // already playing
     bgm.src = config.bgmUrl;
+    bgm.loop = true;
     bgm.volume = 0.55;
     bgm.play().catch(() => {
-      // Autoplay was blocked (no fresh user gesture) — start it on the
-      // next tap anywhere on the page instead.
+      // Still blocked — fall back to starting it on the next tap anywhere,
+      // and keep trying on every tap (not just once) until it succeeds.
       const resume = () => {
-        bgm.play().catch(() => {});
-        document.removeEventListener('click', resume);
+        bgm.play().then(() => {
+          document.removeEventListener('click', resume);
+          document.removeEventListener('touchend', resume);
+        }).catch(() => {});
       };
-      document.addEventListener('click', resume, { once: true });
+      document.addEventListener('click', resume);
+      document.addEventListener('touchend', resume);
     });
   }
 
@@ -642,6 +663,7 @@
 
     let stage = 0; // 0 = showing gif1, 1 = showing gif2 (waiting for the fade-out tap)
     gifScreen.onclick = () => {
+      unlockBgm();
       if(stage === 0){
         stage = 1;
         hint.style.display = 'none';
@@ -691,6 +713,7 @@
     duoHint.style.display = (config.video2Url || config.image3Url) ? '' : 'none';
 
     duoScreen.onclick = () => {
+      unlockBgm();
       duoHint.style.display = 'none';
       duoScreen.onclick = null;
       triggerReveal();
