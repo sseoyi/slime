@@ -199,6 +199,21 @@
   }
   @keyframes hintpulse{ 0%,100%{ opacity:0.55; } 50%{ opacity:1; } }
 
+  /* ---------- duo (video-2 + image-3, side by side) ---------- */
+  #screen-duo{ cursor:pointer; }
+  .duo-row{
+    display:flex; flex-direction:row; align-items:center; justify-content:center;
+    gap:4vw; width:100%;
+  }
+  .duo-row video, .duo-row img{
+    max-width:44vw; max-height:56vh; width:auto; height:auto;
+    object-fit:contain; border-radius:14px;
+    transition:transform 0.35s ease;
+  }
+  #screen-duo:hover .duo-row video,
+  #screen-duo:hover .duo-row img{ transform:scale(1.02); }
+
+
   /* ---------- reveal (white fade) ---------- */
   #whiteOverlay{
     position:fixed; inset:0; z-index:60;
@@ -248,6 +263,14 @@
     <img id="gifImg" alt="Tap to continue">
     <div class="gif-hint">🎁 tap 🎁</div>
   </div>
+
+  <div class="screen" id="screen-duo">
+    <div class="duo-row">
+      <video id="duoVideo" autoplay muted loop playsinline></video>
+      <img id="duoImage" alt="">
+    </div>
+    <div class="gif-hint" id="duoHint">🎁 tap 🎁</div>
+  </div>
 </div>
 
 <div id="whiteOverlay">
@@ -271,6 +294,7 @@
     empty: document.getElementById('screen-empty'),
     video: document.getElementById('screen-video'),
     gif: document.getElementById('screen-gif'),
+    duo: document.getElementById('screen-duo'),
   };
 
   let config = null;       // { videoUrl, gif1Url, gif2Url, revealMessage, recipientName }
@@ -334,11 +358,15 @@
     const videoUrlGuess = rawUrl(RES_DIR + 'video.mp4');
     const gif1UrlGuess = rawUrl(RES_DIR + 'img-1.gif');
     const gif2UrlGuess = rawUrl(RES_DIR + 'img-2.gif');
+    const video2UrlGuess = rawUrl(RES_DIR + 'video-2.mp4');
+    const image3UrlGuess = rawUrl(RES_DIR + 'image-3.jpg');
 
-    const [videoFound, gif1Found, gif2Found] = await Promise.all([
+    const [videoFound, gif1Found, gif2Found, video2Found, image3Found] = await Promise.all([
       fileExists(videoUrlGuess),
       fileExists(gif1UrlGuess),
       fileExists(gif2UrlGuess),
+      fileExists(video2UrlGuess),
+      fileExists(image3UrlGuess),
     ]);
 
     mediaExists.video = videoFound;
@@ -355,6 +383,8 @@
       videoUrl: videoFound ? videoUrlGuess : '',
       gif1Url: gif1Found ? gif1UrlGuess : '',
       gif2Url: gif2Found ? gif2UrlGuess : '',
+      video2Url: video2Found ? video2UrlGuess : '',
+      image3Url: image3Found ? image3UrlGuess : '',
       revealMessage: data.revealMessage,
       recipientName: data.recipientName,
     };
@@ -416,15 +446,58 @@
     hint.style.display = config.gif1Url ? '' : 'none';
     gifScreen.classList.remove('switched');
 
-    let switched = false;
+    let stage = 0; // 0 = showing gif1, 1 = showing gif2 (waiting for the fade-out tap)
     gifScreen.onclick = () => {
-      if(switched) return;
-      switched = true;
-      hint.style.display = 'none';
-      if(config.gif2Url){
-        gifImg.src = config.gif2Url;
+      if(stage === 0){
+        stage = 1;
+        hint.style.display = 'none';
+        if(config.gif2Url){
+          gifImg.src = config.gif2Url;
+          gifScreen.classList.add('switched');
+          return; // this tap only switches to gif2 — the NEXT tap fades it out
+        }
+        // no gif2 to show — fall through and advance immediately
       }
-      gifScreen.classList.add('switched');
+      gifScreen.onclick = null;
+      advanceFromGif();
+    };
+  }
+
+  function advanceFromGif(){
+    if(config.video2Url || config.image3Url){
+      showScreen('duo');
+      startDuoStage();
+    } else {
+      triggerReveal();
+    }
+  }
+
+  function startDuoStage(){
+    const duoScreen = document.getElementById('screen-duo');
+    const video2 = document.getElementById('duoVideo');
+    const img3 = document.getElementById('duoImage');
+    const duoHint = document.getElementById('duoHint');
+
+    if(config.video2Url){
+      video2.src = config.video2Url;
+      video2.style.display = '';
+      video2.play().catch(() => { /* autoplay may be blocked — video still shows first frame */ });
+    } else {
+      video2.style.display = 'none';
+    }
+
+    if(config.image3Url){
+      img3.src = config.image3Url;
+      img3.style.display = '';
+    } else {
+      img3.style.display = 'none';
+    }
+
+    duoHint.style.display = (config.video2Url || config.image3Url) ? '' : 'none';
+
+    duoScreen.onclick = () => {
+      duoHint.style.display = 'none';
+      duoScreen.onclick = null;
       triggerReveal();
     };
   }
