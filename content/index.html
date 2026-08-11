@@ -281,6 +281,8 @@
   </div>
 </div>
 
+<audio id="bgmAudio" loop preload="none"></audio>
+
 <div id="whiteOverlay">
   <div class="reveal-content" id="revealContent">
     <div id="revealMessage">Happy Birthday</div>
@@ -368,13 +370,15 @@
     const gif2UrlGuess = rawUrl(RES_DIR + 'img-2.gif');
     const video2UrlGuess = rawUrl(RES_DIR + 'video-2.mp4');
     const image3UrlGuess = rawUrl(RES_DIR + 'image-3.jpg');
+    const bgmUrlGuess = rawUrl(RES_DIR + 'bgm.mp3');
 
-    const [videoFound, gif1Found, gif2Found, video2Found, image3Found] = await Promise.all([
+    const [videoFound, gif1Found, gif2Found, video2Found, image3Found, bgmFound] = await Promise.all([
       fileExists(videoUrlGuess),
       fileExists(gif1UrlGuess),
       fileExists(gif2UrlGuess),
       fileExists(video2UrlGuess),
       fileExists(image3UrlGuess),
+      fileExists(bgmUrlGuess),
     ]);
 
     mediaExists.video = videoFound;
@@ -393,6 +397,7 @@
       gif2Url: gif2Found ? gif2UrlGuess : '',
       video2Url: video2Found ? video2UrlGuess : '',
       image3Url: image3Found ? image3UrlGuess : '',
+      bgmUrl: bgmFound ? bgmUrlGuess : '',
       revealMessage: data.revealMessage,
       recipientName: data.recipientName,
     };
@@ -436,14 +441,33 @@
         });
       };
       video.onended = () => {
+        playBgm();
         showScreen('gif');
         startGifStage();
       };
       showScreen('video');
     } else {
+      playBgm();
       showScreen('gif');
       startGifStage();
     }
+  }
+
+  function playBgm(){
+    if(!config.bgmUrl) return;
+    const bgm = document.getElementById('bgmAudio');
+    if(bgm.src) return; // already started
+    bgm.src = config.bgmUrl;
+    bgm.volume = 0.55;
+    bgm.play().catch(() => {
+      // Autoplay was blocked (no fresh user gesture) — start it on the
+      // next tap anywhere on the page instead.
+      const resume = () => {
+        bgm.play().catch(() => {});
+        document.removeEventListener('click', resume);
+      };
+      document.addEventListener('click', resume, { once: true });
+    });
   }
 
   function burstConfetti(container){
