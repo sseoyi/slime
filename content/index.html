@@ -213,6 +213,13 @@
   #screen-duo:hover .duo-row video,
   #screen-duo:hover .duo-row img{ transform:scale(1.02); }
 
+  /* ---------- confetti / hearts canvases ---------- */
+  .fx-canvas{
+    position:absolute; inset:0;
+    pointer-events:none;
+    z-index:5;
+  }
+
 
   /* ---------- reveal (white fade) ---------- */
   #whiteOverlay{
@@ -227,6 +234,7 @@
     opacity:0; transform:translateY(6px);
     transition:opacity 2s ease 0.35s, transform 2s ease 0.35s;
     text-align:center; padding:6vw;
+    position:relative; z-index:10;
   }
   .reveal-content.show{ opacity:1; transform:translateY(0); }
   #revealMessage{
@@ -438,6 +446,167 @@
     }
   }
 
+  function burstConfetti(container){
+    container.querySelectorAll('.fx-canvas').forEach(c => c.remove());
+    const canvas = document.createElement('canvas');
+    canvas.className = 'fx-canvas';
+    container.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    canvas.width = container.clientWidth;
+    canvas.height = container.clientHeight;
+
+    const colors = ['#ff8fa8', '#ff6b8f', '#f76c6c', '#e3a857', '#bfe3e0', '#ffffff'];
+    const originX = canvas.width / 2;
+    const originY = canvas.height * 0.42;
+    const gravity = 0.32;
+    const groundY = canvas.height - 4;
+    const particles = [];
+    const count = 90;
+    for(let i = 0; i < count; i++){
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 4 + Math.random() * 9;
+      particles.push({
+        x: originX, y: originY,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 3,
+        size: 4 + Math.random() * 5,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        rotation: Math.random() * Math.PI * 2,
+        vr: (Math.random() - 0.5) * 0.4,
+        resting: false,
+        round: Math.random() > 0.5,
+      });
+    }
+
+    let start = null;
+    const duration = 4200;
+    const fadeStart = 3400;
+
+    function frame(ts){
+      if(!start) start = ts;
+      const elapsed = ts - start;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      particles.forEach((p) => {
+        if(!p.resting){
+          p.vy += gravity;
+          p.vx *= 0.995;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.rotation += p.vr;
+          if(p.y >= groundY){
+            p.y = groundY;
+            p.vy *= -0.35;
+            p.vx *= 0.6;
+            if(Math.abs(p.vy) < 1.2){
+              p.vy = 0;
+              p.resting = true;
+            }
+          }
+        }
+        const alpha = elapsed > fadeStart ? Math.max(0, 1 - (elapsed - fadeStart) / (duration - fadeStart)) : 1;
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+        ctx.fillStyle = p.color;
+        if(p.round){
+          ctx.beginPath();
+          ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.fillRect(-p.size / 2, -p.size / 3, p.size, p.size * 0.66);
+        }
+        ctx.restore();
+      });
+
+      if(elapsed < duration){
+        requestAnimationFrame(frame);
+      } else {
+        canvas.remove();
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function startHeartsRain(container){
+    container.querySelectorAll('.fx-canvas').forEach(c => c.remove());
+    const canvas = document.createElement('canvas');
+    canvas.className = 'fx-canvas hearts-canvas';
+    container.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    canvas.width = container.clientWidth;
+    canvas.height = container.clientHeight;
+
+    const emojis = ['❤️', '💕', '💖', '💗', '💓', '💞'];
+    const gravity = 0.12;
+    const groundY = canvas.height;
+    const bucketCount = 26;
+    const bucketWidth = canvas.width / bucketCount;
+    const bucketHeights = new Array(bucketCount).fill(0);
+    const hearts = [];
+
+    let spawning = true;
+    let animating = false;
+
+    function ensureAnimating(){
+      if(!animating){
+        animating = true;
+        requestAnimationFrame(frame);
+      }
+    }
+
+    function frame(){
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let anyMoving = false;
+      hearts.forEach((h) => {
+        if(!h.resting){
+          anyMoving = true;
+          h.vy += gravity;
+          h.y += h.vy;
+          const bucket = Math.min(bucketCount - 1, Math.max(0, Math.floor(h.x / bucketWidth)));
+          const floorForBucket = groundY - bucketHeights[bucket];
+          if(h.y + h.size * 0.5 >= floorForBucket){
+            h.y = floorForBucket - h.size * 0.5;
+            h.resting = true;
+            bucketHeights[bucket] += h.size * 0.6;
+          }
+        }
+        ctx.save();
+        ctx.font = h.size + 'px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.translate(h.x, h.y);
+        ctx.rotate(h.rotation);
+        ctx.fillText(h.emoji, 0, 0);
+        ctx.restore();
+      });
+
+      if(anyMoving || spawning){
+        requestAnimationFrame(frame);
+      } else {
+        animating = false;
+      }
+    }
+
+    const spawnInterval = setInterval(() => {
+      if(!spawning){ clearInterval(spawnInterval); return; }
+      hearts.push({
+        x: Math.random() * canvas.width,
+        y: -20,
+        vy: 1 + Math.random() * 1.2,
+        size: 20 + Math.random() * 16,
+        emoji: emojis[Math.floor(Math.random() * emojis.length)],
+        resting: false,
+        rotation: (Math.random() - 0.5) * 0.6,
+      });
+      ensureAnimating();
+    }, 180);
+
+    setTimeout(() => { spawning = false; }, 9000);
+    ensureAnimating();
+  }
+
   function startGifStage(){
     const gifImg = document.getElementById('gifImg');
     const gifScreen = document.getElementById('screen-gif');
@@ -445,6 +614,7 @@
     gifImg.src = config.gif1Url || '';
     hint.style.display = config.gif1Url ? '' : 'none';
     gifScreen.classList.remove('switched');
+    gifScreen.querySelectorAll('.fx-canvas').forEach(c => c.remove());
 
     let stage = 0; // 0 = showing gif1, 1 = showing gif2 (waiting for the fade-out tap)
     gifScreen.onclick = () => {
@@ -454,6 +624,7 @@
         if(config.gif2Url){
           gifImg.src = config.gif2Url;
           gifScreen.classList.add('switched');
+          burstConfetti(gifScreen);
           return; // this tap only switches to gif2 — the NEXT tap fades it out
         }
         // no gif2 to show — fall through and advance immediately
@@ -514,6 +685,7 @@
         if(e.propertyName !== 'opacity') return;
         overlay.removeEventListener('transitionend', onEnd);
         content.classList.add('show');
+        startHeartsRain(overlay);
       };
       overlay.addEventListener('transitionend', onEnd);
     }, 1600);
